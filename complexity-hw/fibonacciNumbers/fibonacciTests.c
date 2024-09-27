@@ -24,7 +24,7 @@ bool testCaseFibonacciNonNatural(int (*fibonacci)(int*, int)) {
     }
 
     fibonacci(-1, &error);
-    return error == -1
+    return error == -1;
 }
 
 bool testCaseFibonacciOverflowReturnsError(int (*fibonacci)(int*, int)) {
