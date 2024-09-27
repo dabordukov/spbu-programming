@@ -5,12 +5,7 @@
 #include <time.h>
 
 #include "auxiliaries.h"
-
-void swap(int* a, int* b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
+#include "fibonacciTests.h"
 
 /**Sets error = -1 on bad N
    error = 1 on overflow **/
