@@ -69,44 +69,6 @@ int fibonacciIterative(int n, int* error) {
     return fibonacci[1];
 }
 
-void testCaseFibonacciFirst20() {
-    int precalculatedFibonacci[20] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55,
-                                      89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765};
-
-    int result = 0, error = 0;
-    for (int i = 0; i < 20; i++) {
-        result = fibonacciIterative(i + 1, &error);
-        assert(result == precalculatedFibonacci[i] && error == 0);
-
-        result = fibonacciRecursive(i + 1, &error);
-        assert(result == precalculatedFibonacci[i] && error == 0);
-    }
-}
-
-void testCaseFibonacciNonNatural() {
-    int error = 0;
-    fibonacciIterative(0, &error);
-    assert(error == -1);
-
-    fibonacciRecursive(0, &error);
-    assert(error == -1);
-
-    fibonacciIterative(-1, &error);
-    assert(error == -1);
-
-    fibonacciRecursive(-1, &error);
-    assert(error == -1);
-}
-
-void testCaseFibonacciOverflow() {
-    int error = 0;
-    fibonacciIterative(47, &error);
-    assert(error == 1);
-
-    fibonacciRecursive(47, &error);
-    assert(error == 1);
-}
-
 void testAll() {
     printf("Testing...\n");
     testCaseFibonacciFirst20();
