@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdbool.h>
 
-bool testCaseFibonacciFirst20(int (*fibonacci)(int*, int)) {
+bool testCaseFibonacciFirst20(int (*fibonacci)(int, int*)) {
     int precalculatedFibonacci[20] = {1, 1, 2, 3, 5, 8, 13, 21, 34, 55,
                                       89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765};
 
@@ -16,7 +16,7 @@ bool testCaseFibonacciFirst20(int (*fibonacci)(int*, int)) {
     return true;
 }
 
-bool testCaseFibonacciNonNatural(int (*fibonacci)(int*, int)) {
+bool testCaseFibonacciNonNatural(int (*fibonacci)(int, int*)) {
     int error = 0;
     fibonacci(0, &error);
     if (error != -1) {
@@ -27,7 +27,7 @@ bool testCaseFibonacciNonNatural(int (*fibonacci)(int*, int)) {
     return error == -1;
 }
 
-bool testCaseFibonacciOverflowReturnsError(int (*fibonacci)(int*, int)) {
+bool testCaseFibonacciOverflowReturnsError(int (*fibonacci)(int, int*)) {
     int error = 0;
     fibonacci(47, &error);
     return error == 1;

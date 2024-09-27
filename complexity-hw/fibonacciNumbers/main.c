@@ -1,3 +1,6 @@
+/*Реализовать вычисление чисел Фибоначчи рекурсивно, реализовать итеративно,
+ выяснить, с какого номера числа Фибоначчи рекурсивный вариант заметно медленнее итеративного. */
+
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -16,13 +19,14 @@ void testAll() {
     assert(testCaseFibonacciFirst20(fibonacciRecursive) == 1);
     assert(testCaseFibonacciNonNatural(fibonacciRecursive) == 1);
 }
+
 int main() {
     printf("Testing..\n");
     testAll();
     printf("All tests passed\n");
 
     int error = 0;
-    clock_t timeDifference = 0, timeIterativeBegin = 0, timeIterativeEnd = 0, timeRecursiveBegin = 0, timeRecursiveEnd = 0;
+    clock_t timeDifference = 0, timeIterative = 0, timeRecursive = 0;
     int recursiveSlowerTimes = 1000000;
     int recursiveTimeLimitSeconds = 5;
     bool restrictInformed = false;
@@ -31,11 +35,10 @@ int main() {
     int i = 0;
     while (timeDifference < recursiveSlowerTimes) {
         i++;
+        int result = 0;
 
         error = 0;
-        timeIterativeBegin = clock();
-        int result = fibonacciIterative(i, &error);
-        timeIterativeEnd = clock() + 1;  // fix division by zero
+        timeIterative = computeRuntimeFibonacci(fibonacciIterative, i, &result, &error);
 
         if (error == 1) {
             overflowFlag = true;
@@ -43,12 +46,10 @@ int main() {
         }
 
         error = 0;
-        timeRecursiveBegin = clock();
-        fibonacciRecursive(i, &error);
-        timeRecursiveEnd = clock();
-        timeDifference = (timeRecursiveEnd - timeRecursiveBegin) / (timeIterativeEnd - timeIterativeBegin);
+        timeRecursive = computeRuntimeFibonacci(fibonacciRecursive, i, &result, &error);
+        timeDifference = timeRecursive / timeIterative;
 
-        if (!restrictInformed && (double)(timeRecursiveEnd - timeRecursiveBegin) / CLOCKS_PER_SEC > recursiveTimeLimitSeconds) {
+        if (!restrictInformed && (double)(timeRecursive) / CLOCKS_PER_SEC > recursiveTimeLimitSeconds) {
             printf("Recursive takes more than %ds. Press CTRL-C not to wait anymore.\nChoose another recursiveSlowerTimes value\n", recursiveTimeLimitSeconds);
             restrictInformed = 1;
         }
