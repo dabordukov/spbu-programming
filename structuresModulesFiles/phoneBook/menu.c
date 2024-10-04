@@ -1,14 +1,13 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 #ifdef _WIN32
 #include <conio.h>
 #else
+#include <stdio.h>
 #define clrscr() printf("\e[1;1H\e[2J")
 #endif
 
 #include "auxiliaries.h"
-#include "phoneBook.h"
 
 void printMenu() {
     printf(
@@ -21,10 +20,8 @@ void printMenu() {
 }
 
 void menu() {
-    clrscr();
     char userChoice = 0;
     while (userChoice != '0') {
-        clrscr();
         printMenu();
         printf("Выберите действие: ");
         scanf("%c", &userChoice);
@@ -50,10 +47,4 @@ void menu() {
                 break;
         }
     }
-}
-
-phoneBook book;
-
-int main() {
-    book = phoneBookInit();
 }
