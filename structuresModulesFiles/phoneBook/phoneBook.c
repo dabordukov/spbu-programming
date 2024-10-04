@@ -1,20 +1,11 @@
 #include "phoneBook.h"
 
 #include "auxiliaries.h"
-
-struct phoneNumber {
-    char* data;
-    int size;
-};
-
-struct name {
-    char* data;
-    int size;
-};
+#include "my_string.h"
 
 typedef struct phoneBookNode {
-    struct phoneNumber number;
-    struct name name;
+    string number;
+    string name;
 } phoneBookNode;
 
 struct phoneBook {
@@ -26,4 +17,8 @@ void* phoneBookInit() {
     phoneBook book = checkedMalloc(sizeof(struct phoneBook));
     book->size = 0;
     return book;
+}
+
+int phoneBookAddEntry(phoneBook book, string name, string number) {
+    return 0;
 }

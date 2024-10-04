@@ -1,5 +1,7 @@
 {
   "files.associations": {
-    "random": "c"
+    "random": "c",
+    "auxiliaries.h": "c",
+    "my_string.h": "c"
   }
 }

@@ -3,5 +3,6 @@
 
 #define PHONEBOOK_MAX_ENTRIES 100
 typedef struct phoneBook* phoneBook;
+void* phoneBookInit();
 
 #endif

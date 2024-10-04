@@ -8,6 +8,7 @@
 #endif
 
 #include "auxiliaries.h"
+#include "my_string.h"
 #include "phoneBook.h"
 
 void printMenu() {
