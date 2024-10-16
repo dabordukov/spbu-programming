@@ -1,4 +1,4 @@
 all:
-	gcc -Wall phoneBook/tests/phoneBookTest.c main.c phoneBook/phoneBook.c phoneBook/auxiliaries.c auxiliaries.c -o main -lm
+	gcc -Wall main.c phoneBook/phoneBook.c phoneBook/memoryAuxiliaries.c phoneBook/ioAuxiliaries.c -o main -lm
 run: all
 	./main

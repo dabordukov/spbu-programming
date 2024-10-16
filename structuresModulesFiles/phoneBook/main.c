@@ -12,7 +12,7 @@
 #define clrscr() system("clear")
 #endif
 
-#include "auxiliaries.h"
+#include "phoneBook/ioAuxiliaries.h"
 #include "phoneBook/phoneBook.h"
 #include "phoneBook/tests/phoneBookTest.h"
 
@@ -65,12 +65,12 @@ void addEntry() {
 
     char name[PHONEBOOK_NAME_LENGTH_MAX] = {0};
     printf("Введите имя (не более %d символов): ", PHONEBOOK_NAME_LENGTH_MAX - 1);
-    readStringN(name, PHONEBOOK_NAME_LENGTH_MAX);
+    readLineN(name, PHONEBOOK_NAME_LENGTH_MAX);
 
     char number[PHONEBOOK_NUMBER_LENGTH_MAX] = {0};
     do {
         printf("Введите номер (не более %d цифр): ", PHONEBOOK_NUMBER_LENGTH_MAX - 1);
-        readStringN(number, PHONEBOOK_NUMBER_LENGTH_MAX);
+        readLineN(number, PHONEBOOK_NUMBER_LENGTH_MAX);
     } while (!isValidPhoneNumber(number));
 
     // wchar_t nameWideChar[PHONEBOOK_NAME_LENGTH_MAX] = {0};
@@ -89,14 +89,13 @@ void findEntryByName() {
 
     printf("Введите имя для поиска: ");
     char name[PHONEBOOK_NAME_LENGTH_MAX] = {0};
-    readStringN(name, PHONEBOOK_NAME_LENGTH_MAX);
-
-    // wchar_t nameWideChar[PHONEBOOK_NAME_LENGTH_MAX] = {0};
-    // mbstowcs(nameWideChar, name, PHONEBOOK_NAME_LENGTH_MAX);
+    readLineN(name, PHONEBOOK_NAME_LENGTH_MAX);
 
     int entriesCount = findSimilarNamesPhoneBook(&book, name, findResults);
     for (int i = 0; i < entriesCount; i++) {
-        phoneBookEntryPrint(&book.entries[findResults[i]], (int)log10(entriesCount));
+        printf("%d) ", i + 1);
+        phoneBookEntryPrint(&book.entries[findResults[i]], (int)log10(entriesCount) + 3);
+        printf("\n");
     }
 }
 
@@ -106,7 +105,7 @@ void findEntryByPhoneNumber() {
     char number[PHONEBOOK_NUMBER_LENGTH_MAX] = {0};
     do {
         printf("Введите номер для поиска (не более %d цифр): ", PHONEBOOK_NUMBER_LENGTH_MAX - 1);
-        readStringN(number, PHONEBOOK_NUMBER_LENGTH_MAX);
+        readLineN(number, PHONEBOOK_NUMBER_LENGTH_MAX);
     } while (!isValidPhoneNumber(number));
 
     int entriesCount = findNumberPhoneBook(&book, number, findResults);
@@ -160,6 +159,6 @@ int main() {
     // runTest();
     clrscr();
 
-    // load();
+    load();
     menu();
 }

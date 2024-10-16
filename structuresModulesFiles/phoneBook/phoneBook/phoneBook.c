@@ -6,7 +6,8 @@
 #include <string.h>
 #include <wchar.h>
 
-#include "auxiliaries.h"
+#include "ioAuxiliaries.h"
+#include "memoryAuxiliaries.h"
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
@@ -156,7 +157,7 @@ void phoneBookEntryFPrint(FILE* stream, phoneBookEntry* entry, int spaces) {
     while (spaces--) {
         putc(' ', stream);
     }
-    fprintf(stream, "%s\n\n", entry->number);
+    fprintf(stream, "%s\n", entry->number);
 }
 
 void phoneBookEntryPrint(phoneBookEntry* entry, int spaces) {
@@ -172,6 +173,7 @@ void phoneBookFPrint(FILE* stream, phoneBook* book) {
     for (int i = 0; i < book->size; i++) {
         fprintf(stream, "%d) ", i + 1);
         phoneBookEntryFPrint(stream, &book->entries[i], (int)log10(book->size) + 3);
+        fprintf(stream, "\n");
     }
 }
 
@@ -184,15 +186,18 @@ int loadPhoneBook(phoneBook* book, const char* phoneBookDatabase) {
     if (storage == NULL) {
         return 1;
     }
+    int size;
+    fscanf(storage, "%d\n", &size);
+    book->size = size;
 
-    int size = fread(book, sizeof(phoneBook), 1, storage);
-    fclose(storage);
-    if (size != 1 || !book->saved) {
-        fprintf(stderr, "Файл поврежден.\n");
-        book->saved = false;
-        book->size = 0;
-        return 2;
+    for (int i = 0; i < size; i++) {
+        freadLineN(storage, book->entries[i].name, PHONEBOOK_NAME_LENGTH_MAX);
+        freadLineN(storage, book->entries[i].number, PHONEBOOK_NUMBER_LENGTH_MAX);
     }
+
+    fclose(storage);
+    book->saved = true;
+
     return 0;
 }
 
@@ -203,13 +208,12 @@ int savePhoneBook(phoneBook* book, const char* phoneBookDatabase) {
         return 2;
     }
     book->saved = true;
-    int size = fwrite(book, sizeof(phoneBook), 1, storage);
-    fclose(storage);
-    if (size != 1) {
-        fprintf(stderr, "Can't save file\n");
-        book->saved = false;
-        return 1;
+
+    fprintf(storage, "%d\n", book->size);
+    for (int i = 0; i < book->size; i++) {
+        phoneBookEntryFPrint(storage, &book->entries[i], 0);
     }
 
+    fclose(storage);
     return 0;
 }

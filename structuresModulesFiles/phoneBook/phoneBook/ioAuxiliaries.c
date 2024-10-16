@@ -19,7 +19,7 @@ size_t freadLineN(FILE* stream, char* string, size_t size) {
     }
     string[count] = 0;  // terminator
 
-    if (c != '\n' && c != EOF) {
+    if (stream == stdin && c != '\n' && c != EOF) {
         flushSTDIN();
     }
 
@@ -27,5 +27,5 @@ size_t freadLineN(FILE* stream, char* string, size_t size) {
 }
 
 size_t readLineN(char* string, size_t size) {
-    return freadLineN(stdout, string, size);
+    return freadLineN(stdin, string, size);
 }
