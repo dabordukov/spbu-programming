@@ -7,9 +7,9 @@ void flushSTDIN() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-/* Read not more than SIZE-1 chars from stdin and write to STRING.
+/* Read from STREAM until newline, not more than SIZE-1 chars and write to STRING.
    Return number of chars written to STRING. */
-size_t freadStringN(FILE* stream, char* string, size_t size) {
+size_t freadLineN(FILE* stream, char* string, size_t size) {
     size_t count = 0;
     size--;  // leave one byte for terminator
     int c = EOF;
@@ -26,6 +26,6 @@ size_t freadStringN(FILE* stream, char* string, size_t size) {
     return count;
 }
 
-size_t readStringN(char* string, size_t size) {
-    return freadStringN(stdout, string, size);
+size_t readLineN(char* string, size_t size) {
+    return freadLineN(stdout, string, size);
 }
