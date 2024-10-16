@@ -73,10 +73,6 @@ void addEntry() {
         readLineN(number, PHONEBOOK_NUMBER_LENGTH_MAX);
     } while (!isValidPhoneNumber(number));
 
-    // wchar_t nameWideChar[PHONEBOOK_NAME_LENGTH_MAX] = {0};
-    // mbstowcs(nameWideChar, name, PHONEBOOK_NAME_LENGTH_MAX - 1);
-    printf("RESULT: name: %s number: %s\n", name, number);
-
     phoneBookAddEntry(&book, name, number);
 }
 
