@@ -63,9 +63,9 @@ void addEntry() {
         return;
     }
 
-    char name[PHONEBOOK_NAME_LENGTH_MAX * sizeof(wchar_t)] = {0};
+    char name[PHONEBOOK_NAME_LENGTH_MAX] = {0};
     printf("Введите имя (не более %d символов): ", PHONEBOOK_NAME_LENGTH_MAX - 1);
-    readStringN(name, PHONEBOOK_NAME_LENGTH_MAX * sizeof(wchar_t));
+    readStringN(name, PHONEBOOK_NAME_LENGTH_MAX);
 
     char number[PHONEBOOK_NUMBER_LENGTH_MAX] = {0};
     do {
@@ -73,11 +73,11 @@ void addEntry() {
         readStringN(number, PHONEBOOK_NUMBER_LENGTH_MAX);
     } while (!isValidPhoneNumber(number));
 
-    wchar_t nameWideChar[PHONEBOOK_NAME_LENGTH_MAX] = {0};
-    mbstowcs(nameWideChar, name, PHONEBOOK_NAME_LENGTH_MAX - 1);
-    printf("RESULT: name: %ls number: %s\n", nameWideChar, number);
+    // wchar_t nameWideChar[PHONEBOOK_NAME_LENGTH_MAX] = {0};
+    // mbstowcs(nameWideChar, name, PHONEBOOK_NAME_LENGTH_MAX - 1);
+    printf("RESULT: name: %s number: %s\n", name, number);
 
-    phoneBookAddEntry(&book, nameWideChar, number);
+    phoneBookAddEntry(&book, name, number);
 }
 
 void printPhoneBook() {
@@ -91,10 +91,10 @@ void findEntryByName() {
     char name[PHONEBOOK_NAME_LENGTH_MAX] = {0};
     readStringN(name, PHONEBOOK_NAME_LENGTH_MAX);
 
-    wchar_t nameWideChar[PHONEBOOK_NAME_LENGTH_MAX] = {0};
-    mbstowcs(nameWideChar, name, sizeof(name));
+    // wchar_t nameWideChar[PHONEBOOK_NAME_LENGTH_MAX] = {0};
+    // mbstowcs(nameWideChar, name, PHONEBOOK_NAME_LENGTH_MAX);
 
-    int entriesCount = findSimilarNamesPhoneBook(&book, nameWideChar, findResults);
+    int entriesCount = findSimilarNamesPhoneBook(&book, name, findResults);
     for (int i = 0; i < entriesCount; i++) {
         phoneBookEntryPrint(&book.entries[findResults[i]], (int)log10(entriesCount));
     }
@@ -157,9 +157,9 @@ int main() {
 #else
     setlocale(LC_CTYPE, "");
 #endif
-    runTest();
+    // runTest();
     clrscr();
 
-    load();
+    // load();
     menu();
 }

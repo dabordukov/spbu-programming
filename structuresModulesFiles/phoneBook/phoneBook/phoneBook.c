@@ -17,12 +17,12 @@ bool isDigit(char c) {
 }
 
 // returns 1 on full phoneBook
-int phoneBookAddEntry(phoneBook* book, wchar_t* name, char* number) {
+int phoneBookAddEntry(phoneBook* book, char* name, char* number) {
     if (book->size == PHONEBOOK_MAX_ENTRIES) {
         return 1;
     }
 
-    wcsncpy(book->entries[book->size].name, name, PHONEBOOK_NAME_LENGTH_MAX);
+    strncpy(book->entries[book->size].name, name, PHONEBOOK_NAME_LENGTH_MAX);
     strncpy(book->entries[book->size].number, number, PHONEBOOK_NUMBER_LENGTH_MAX);
 
     book->size++;
@@ -81,14 +81,23 @@ int levenshteinDistanceNamePhoneBook(wchar_t* name, wchar_t* search) {
     return levenshteinDistance;
 }
 
-int findSimilarNamesPhoneBook(phoneBook* book, wchar_t* name, int* results) {
+int findSimilarNamesPhoneBook(phoneBook* book, char* searchName, int* results) {
+    wchar_t* wcSearchName = checkedCalloc(PHONEBOOK_NAME_LENGTH_MAX, sizeof(wchar_t));
+    wchar_t* wcCurrentName = checkedCalloc(PHONEBOOK_NAME_LENGTH_MAX, sizeof(wchar_t));
+
+    mbstowcs(wcSearchName, searchName, PHONEBOOK_NAME_LENGTH_MAX);
     int count = 0;
     for (int i = 0; i < book->size; i++) {
-        int distance = levenshteinDistanceNamePhoneBook(book->entries[i].name, name);
-        if (wcslen(book->entries[i].name) > distance * 4) {
+        mbstowcs(wcCurrentName, book->entries[i].name, PHONEBOOK_NAME_LENGTH_MAX);
+
+        int distance = levenshteinDistanceNamePhoneBook(wcCurrentName, wcSearchName);
+        if (wcslen(wcCurrentName) > distance * 4) {
             results[count++] = i;
         }
     }
+
+    free(wcSearchName);
+    free(wcCurrentName);
     return count;
 }
 
@@ -143,7 +152,7 @@ int findNumberPhoneBook(phoneBook* book, char* number, int* results) {
 }
 
 void phoneBookEntryFPrint(FILE* stream, phoneBookEntry* entry, int spaces) {
-    fprintf(stream, "%ls\n", entry->name);
+    fprintf(stream, "%s\n", entry->name);
     while (spaces--) {
         putc(' ', stream);
     }
