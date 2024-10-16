@@ -4,4 +4,5 @@
 
 void flushSTDIN();
 size_t readStringN(char* string, size_t size);
+size_t freadStringN(FILE* stream, char* string, size_t size);
 #endif
