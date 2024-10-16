@@ -6,10 +6,16 @@
 #include <wchar.h>
 
 #ifdef _WIN32
-#define clrscr() system("cls")
+#define clrscr()         \
+    if (system("cls")) { \
+        puts("");        \
+    }
 #include <windows.h>
 #else
-#define clrscr() system("clear")
+#define clrscr()           \
+    if (system("clear")) { \
+        puts("");          \
+    }
 #endif
 
 #include "phoneBook/ioAuxiliaries.h"
@@ -64,12 +70,12 @@ void addEntry() {
     }
 
     char name[PHONEBOOK_NAME_LENGTH_MAX] = {0};
-    printf("Введите имя (не более %d символов): ", PHONEBOOK_NAME_LENGTH_MAX - 1);
-    readLineN(name, PHONEBOOK_NAME_LENGTH_MAX);
+    printf("Введите имя (не более %lu символов): ", PHONEBOOK_NAME_LENGTH_MAX / sizeof(wchar_t));
+    readLineN(name, PHONEBOOK_NAME_LENGTH_MAX / sizeof(wchar_t));
 
     char number[PHONEBOOK_NUMBER_LENGTH_MAX] = {0};
     do {
-        printf("Введите номер (не более %d цифр): ", PHONEBOOK_NUMBER_LENGTH_MAX - 1);
+        printf("Введите номер (не более %lu цифр): ", PHONEBOOK_NUMBER_LENGTH_MAX - 1);
         readLineN(number, PHONEBOOK_NUMBER_LENGTH_MAX);
     } while (!isValidPhoneNumber(number));
 
@@ -85,7 +91,7 @@ void findEntryByName() {
 
     printf("Введите имя для поиска: ");
     char name[PHONEBOOK_NAME_LENGTH_MAX] = {0};
-    readLineN(name, PHONEBOOK_NAME_LENGTH_MAX);
+    readLineN(name, PHONEBOOK_NAME_LENGTH_MAX / sizeof(wchar_t));
 
     int entriesCount = findSimilarNamesPhoneBook(&book, name, findResults);
     for (int i = 0; i < entriesCount; i++) {
@@ -100,7 +106,7 @@ void findEntryByPhoneNumber() {
 
     char number[PHONEBOOK_NUMBER_LENGTH_MAX] = {0};
     do {
-        printf("Введите номер для поиска (не более %d цифр): ", PHONEBOOK_NUMBER_LENGTH_MAX - 1);
+        printf("Введите номер для поиска (не более %lu цифр): ", PHONEBOOK_NUMBER_LENGTH_MAX - 1);
         readLineN(number, PHONEBOOK_NUMBER_LENGTH_MAX);
     } while (!isValidPhoneNumber(number));
 
@@ -114,8 +120,9 @@ void menu() {
     char userChoice = 0;
     while (userChoice != '0') {
         puts(menuMessage);
-        printf("Выберите действие: ");
-        scanf("%c", &userChoice);
+        do {
+            printf("Выберите действие: ");
+        } while (scanf("%c", &userChoice) != 1);
         flushSTDIN();
         switch (userChoice) {
             case '0':
