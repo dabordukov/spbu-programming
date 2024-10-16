@@ -5,7 +5,7 @@
 void* checkedMalloc(size_t size) {
     void* p = malloc(size);
     if (!p) {
-        fprintf(stderr, "Can't allocate %zu bytes of memory!\n", size);
+        fprintf(stderr, "Can't allocate %lu bytes of memory!\n", size);
         abort();
     }
     return p;
@@ -14,7 +14,7 @@ void* checkedMalloc(size_t size) {
 void* checkedCalloc(size_t nmemb, size_t size) {
     void* p = calloc(nmemb, size);
     if (!p) {
-        fprintf(stderr, "Can't allocate %zu bytes of memory!\n", size);
+        fprintf(stderr, "Can't allocate %lu bytes of memory!\n", size);
         abort();
     }
     return p;
