@@ -6,7 +6,7 @@
 
 #define PHONEBOOK_MAX_ENTRIES (size_t)100
 #define PHONEBOOK_NUMBER_LENGTH_MAX 15
-#define PHONEBOOK_NAME_LENGTH_MAX 50
+#define PHONEBOOK_NAME_LENGTH_MAX 50 * sizeof(wchar_t)
 
 typedef struct phoneBookEntry {
     char number[PHONEBOOK_NUMBER_LENGTH_MAX];
