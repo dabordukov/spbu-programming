@@ -154,8 +154,9 @@ int main() {
 #ifdef _WIN32
     system("chcp 1251");
     setlocale(LC_ALL, "Rus");
-#endif
+#else
     setlocale(LC_CTYPE, "");
+#endif
     runTest();
     clrscr();
 
