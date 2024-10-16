@@ -1,5 +1,5 @@
-#ifndef IO_AUX_H
-#define IO_AUX_H 1
+#ifndef PHONEBOOK_IO_AUX_H
+#define PHONEBOOK_IO_AUX_H 1
 #include <stdlib.h>
 
 void flushSTDIN();

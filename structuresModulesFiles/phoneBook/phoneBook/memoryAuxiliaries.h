@@ -1,5 +1,5 @@
-#ifndef PHONEBOOK_AUX_H
-#define PHONEBOOK_AUX_H 1
+#ifndef PHONEBOOK_MEMORY_AUX_H
+#define PHONEBOOK_MEMORY_AUX_H 1
 #include <stdlib.h>
 
 void* checkedMalloc(size_t size);
