@@ -1,27 +1,23 @@
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
 
 #include "../phoneBook.h"
 
-#define DB_LOAD_TEST_FILENAME "dbLoad.test"
+#define JOIN(x, y) x #y
+
+#define PHONEBOOK_TESTS_DIR "phoneBook/tests/"
+#define DB_LOAD_TEST_PATH JOIN(PHONEBOOK_TESTS_DIR, dbLoad.test)
 bool testLoadDatabase() {
     phoneBook book;
     wchar_t names[][PHONEBOOK_NAME_LENGTH_MAX] = {L"qwertyuiop", L"йцукенгшщд"};
     char numbers[][PHONEBOOK_NUMBER_LENGTH_MAX] = {"123456789", " 0 2"};
 
-    loadPhoneBook(&book, DB_LOAD_TEST_FILENAME);
+    loadPhoneBook(&book, DB_LOAD_TEST_PATH);
 
-    FILE* test = fopen(DB_LOAD_TEST_FILENAME, "r");
+    FILE* test = fopen(DB_LOAD_TEST_PATH, "r");
     if (test == NULL) {
-        fprintf(stderr, "Error: Can't open %s for reading.\n", DB_LOAD_TEST_FILENAME);
+        fprintf(stderr, "Error: Can't open %s for reading.\n", DB_LOAD_TEST_PATH);
         return false;
     }
     bool passed = true;
@@ -50,19 +46,19 @@ bool testLoadDatabase() {
     return passed;
 }
 
-#define DB_ADD_ENTRY_TEST_FILENAME "addEntry.test"
+#define DB_ADD_ENTRY_TEST_PATH JOIN(PHONEBOOK_TESTS_DIR, addEntry.test)
 bool testAddEntry() {
     phoneBook book;
-    loadPhoneBook(&book, DB_LOAD_TEST_FILENAME);
+    loadPhoneBook(&book, DB_LOAD_TEST_PATH);
 
     wchar_t name[] = L"тесттесттест1234";
     char number[] = "000000000000";
     phoneBookAddEntry(&book, name, number);
     book.saved = true;
 
-    FILE* test = fopen(DB_ADD_ENTRY_TEST_FILENAME, "r");
+    FILE* test = fopen(DB_ADD_ENTRY_TEST_PATH, "r");
     if (test == NULL) {
-        fprintf(stderr, "Error: Can't open %s for reading.\n", DB_ADD_ENTRY_TEST_FILENAME);
+        fprintf(stderr, "Error: Can't open %s for reading.\n", DB_ADD_ENTRY_TEST_PATH);
         return false;
     }
     bool passed = true;
@@ -85,21 +81,21 @@ bool testAddEntry() {
     return passed;
 }
 
-#define DB_SAVE_TEST_FILENAME DB_ADD_ENTRY_TEST_FILENAME
-#define DB_SAVE_CURR_DB "db.dat"
+#define DB_SAVE_TEST_PATH DB_ADD_ENTRY_TEST_PATH
+#define DB_SAVE_CURR_DB JOIN(PHONEBOOK_TESTS_DIR, db.dat)
 bool testSaveDatabase() {
     phoneBook book;
 
-    loadPhoneBook(&book, DB_LOAD_TEST_FILENAME);
+    loadPhoneBook(&book, DB_LOAD_TEST_PATH);
 
     wchar_t name[] = L"тесттесттест1234";
     char number[] = "000000000000";
     phoneBookAddEntry(&book, name, number);
     savePhoneBook(&book, DB_SAVE_CURR_DB);
 
-    FILE* test = fopen(DB_SAVE_TEST_FILENAME, "r");
+    FILE* test = fopen(DB_SAVE_TEST_PATH, "r");
     if (test == NULL) {
-        fprintf(stderr, "Error: Can't open %s for reading.\n", DB_SAVE_TEST_FILENAME);
+        fprintf(stderr, "Error: Can't open %s for reading.\n", DB_SAVE_TEST_PATH);
         return false;
     }
     FILE* db = fopen(DB_SAVE_CURR_DB, "r");
@@ -128,10 +124,10 @@ bool testSaveDatabase() {
     return passed;
 }
 
-#define SEARCH_BY_NAME_TEST_FILENAME "nameSearch.test"
+#define SEARCH_BY_NAME_TEST_PATH JOIN(PHONEBOOK_TESTS_DIR, nameSearch.test)
 bool testSearchByName() {
     phoneBook book;
-    loadPhoneBook(&book, SEARCH_BY_NAME_TEST_FILENAME);
+    loadPhoneBook(&book, SEARCH_BY_NAME_TEST_PATH);
 
     int findResults[PHONEBOOK_MAX_ENTRIES];
     int entriesCount = findSimilarNamesPhoneBook(&book, L"test", findResults);
@@ -146,10 +142,10 @@ bool testSearchByName() {
     return true;
 }
 
-#define SEARCH_BY_PHONE_NUMBER_TEST_FILENAME "phoneNumberSearch.test"
+#define SEARCH_BY_PHONE_NUMBER_TEST_PATH JOIN(PHONEBOOK_TESTS_DIR, phoneNumberSearch.test)
 bool testSearchByPhoneNumber() {
     phoneBook book;
-    loadPhoneBook(&book, SEARCH_BY_PHONE_NUMBER_TEST_FILENAME);
+    loadPhoneBook(&book, SEARCH_BY_PHONE_NUMBER_TEST_PATH);
 
     char number[] = "12345678";
     int findResults[PHONEBOOK_MAX_ENTRIES];
@@ -161,13 +157,11 @@ bool testSearchByPhoneNumber() {
 }
 
 int runTest() {
-    chdir("phoneBook/tests/");
     assert(testLoadDatabase());
     assert(testAddEntry());
     assert(testSearchByName());
     assert(testSaveDatabase());
     assert(testSearchByPhoneNumber());
 
-    chdir("../../");
     return 0;
 }
