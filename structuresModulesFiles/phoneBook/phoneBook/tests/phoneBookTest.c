@@ -11,6 +11,8 @@
 #define DB_LOAD_TEST_PATH JOIN(PHONEBOOK_TESTS_DIR, dbLoad.test)
 bool testLoadDatabase() {
     phoneBook book;
+    book.size = 0;
+    book.saved = 0;
     char names[][PHONEBOOK_NAME_LENGTH_MAX] = {"qwertyuiop", "тесттест тест"};
     char numbers[][PHONEBOOK_NUMBER_LENGTH_MAX] = {"123456789", "+0000 222"};
 
@@ -30,7 +32,9 @@ bool testLoadDatabase() {
 #define DB_ADD_ENTRY_TEST_PATH JOIN(PHONEBOOK_TESTS_DIR, addEntry.test)
 bool testAddEntry() {
     phoneBook book;
-    // loadPhoneBook(&book, DB_LOAD_TEST_PATH);
+    book.size = 0;
+    book.saved = 0;
+
     char name[] = "тесттесттест1234";
     char number[] = "000000000000";
     phoneBookAddEntry(&book, name, number);
@@ -47,6 +51,8 @@ bool testAddEntry() {
 #define DB_SAVE_CURR_DB JOIN(PHONEBOOK_TESTS_DIR, db.dat)
 bool testSaveDatabase() {
     phoneBook book;
+    book.size = 0;
+    book.saved = 0;
 
     loadPhoneBook(&book, DB_LOAD_TEST_PATH);
 
@@ -87,6 +93,8 @@ bool testSaveDatabase() {
 #define SEARCH_BY_NAME_TEST_PATH JOIN(PHONEBOOK_TESTS_DIR, nameSearch.test)
 bool testSearchByName() {
     phoneBook book;
+    book.size = 0;
+    book.saved = 0;
     loadPhoneBook(&book, SEARCH_BY_NAME_TEST_PATH);
 
     int findResults[PHONEBOOK_MAX_ENTRIES];
@@ -105,6 +113,8 @@ bool testSearchByName() {
 #define SEARCH_BY_PHONE_NUMBER_TEST_PATH JOIN(PHONEBOOK_TESTS_DIR, phoneNumberSearch.test)
 bool testSearchByPhoneNumber() {
     phoneBook book;
+    book.size = 0;
+    book.saved = 0;
     loadPhoneBook(&book, SEARCH_BY_PHONE_NUMBER_TEST_PATH);
 
     char number[] = "12345678";
