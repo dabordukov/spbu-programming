@@ -6,16 +6,7 @@
 #include <wchar.h>
 
 #ifdef _WIN32
-#define clrscr()         \
-    if (system("cls")) { \
-        puts("");        \
-    }
 #include <windows.h>
-#else
-#define clrscr()           \
-    if (system("clear")) { \
-        puts("");          \
-    }
 #endif
 
 #include "phoneBook/ioAuxiliaries.h"
@@ -129,23 +120,18 @@ void menu() {
                 exitProgam();
                 return;
             case '1':
-                clrscr();
                 addEntry();
                 break;
             case '2':
-                clrscr();
                 printPhoneBook();
                 break;
             case '3':
-                clrscr();
                 findEntryByName();
                 break;
             case '4':
-                clrscr();
                 findEntryByPhoneNumber();
                 break;
             case '5':
-                clrscr();
                 save();
                 break;
         }
@@ -159,9 +145,8 @@ int main() {
 #else
     setlocale(LC_CTYPE, "");
 #endif
-    // runTest();
-    clrscr();
 
+    runTest();
     load();
     menu();
 }
