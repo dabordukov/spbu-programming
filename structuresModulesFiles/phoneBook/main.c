@@ -136,6 +136,7 @@ void menu() {
 
 int main() {
 #ifdef _WIN32
+    system("chcp 1251");
     setlocale(LC_ALL, "Russian");
 #else
     setlocale(LC_CTYPE, "");
