@@ -186,16 +186,28 @@ int loadPhoneBook(phoneBook* book, const char* phoneBookDatabase) {
     if (storage == NULL) {
         return 1;
     }
+
     int size;
-    fscanf(storage, "%d\n", &size);
+    if (fscanf(storage, "%d\n", &size) != 1) {
+        fprintf(stderr, "БД повреждена\n");
+        return 2;
+    }
     book->size = size;
 
     for (int i = 0; i < size; i++) {
-        freadLineN(storage, book->entries[i].name, PHONEBOOK_NAME_LENGTH_MAX);
-        freadLineN(storage, book->entries[i].number, PHONEBOOK_NUMBER_LENGTH_MAX);
+        if (freadLineN(storage, book->entries[i].name, PHONEBOOK_NAME_LENGTH_MAX) == 0) {
+            fprintf(stderr, "БД повреждена\n");
+            fclose(storage);
+            return 2;
+        }
+        if (freadLineN(storage, book->entries[i].number, PHONEBOOK_NUMBER_LENGTH_MAX) == 0) {
+            fprintf(stderr, "БД повреждена\n");
+            fclose(storage);
+            return 2;
+        }
     }
-
     fclose(storage);
+
     book->saved = true;
 
     return 0;
@@ -209,7 +221,7 @@ int savePhoneBook(phoneBook* book, const char* phoneBookDatabase) {
     }
     book->saved = true;
 
-    fprintf(storage, "%d\n", book->size);
+    fprintf(storage, "%lu\n", book->size);
     for (int i = 0; i < book->size; i++) {
         phoneBookEntryFPrint(storage, &book->entries[i], 0);
     }
