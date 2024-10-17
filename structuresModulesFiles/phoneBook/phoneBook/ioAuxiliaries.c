@@ -15,6 +15,11 @@ size_t freadLineN(FILE* stream, char* string, size_t size) {
     int c = EOF;
 
     while (size-- && (c = fgetc(stream)) != '\n' && c != EOF) {
+        if (c == '\r') {
+            size++;
+            continue;
+        }
+
         string[count++] = c;
     }
     string[count] = 0;  // terminator
