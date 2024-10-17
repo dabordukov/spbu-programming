@@ -37,7 +37,7 @@ bool isFullPhoneBook(phoneBook* book) {
 }
 
 bool isSavedPhoneBook(phoneBook* book) {
-    return book->saved;
+    return book->saved || book->size == 0;
 }
 
 int levenshteinDistanceNamePhoneBook(wchar_t* name, wchar_t* search) {
