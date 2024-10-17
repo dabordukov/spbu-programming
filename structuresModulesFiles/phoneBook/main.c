@@ -5,10 +5,6 @@
 #include <stdlib.h>
 #include <wchar.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #include "phoneBook/ioAuxiliaries.h"
 #include "phoneBook/phoneBook.h"
 #include "phoneBook/tests/phoneBookTest.h"
@@ -140,8 +136,7 @@ void menu() {
 
 int main() {
 #ifdef _WIN32
-    system("chcp 1251");
-    setlocale(LC_ALL, "Rus");
+    setlocale(LC_ALL, "Russian");
 #else
     setlocale(LC_CTYPE, "");
 #endif
