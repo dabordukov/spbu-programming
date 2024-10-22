@@ -16,7 +16,7 @@ void printArray(int* array, int size) {
 
 void fillArrayRand(int* array, int size, int rangeMax) {
     for (int i = 0; i < size; i++) {
-        array[i] = rand() % rangeMax;
+        array[i] = rand() % rangeMax - rangeMax / 2;
     }
 }
 
