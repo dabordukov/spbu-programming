@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +8,7 @@
 #include "auxiliaries.h"
 #include "sorts.h"
 #define N 100000
-#define RANGE_MAX COUNT_SORT_RANGE_MAX
+#define RANGE_MAX INT_MAX
 
 int main() {
     srand(time(NULL));

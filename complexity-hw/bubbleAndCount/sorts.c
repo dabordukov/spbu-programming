@@ -13,16 +13,35 @@ void bubbleSort(int* array, int size) {
         }
     }
 }
-
-void countSort(int* array, int size) {
-    int countArray[COUNT_SORT_RANGE_MAX] = {0};
-    for (int i = 0; i < size; i++) {
-        countArray[array[i]]++;
+int countSort(int* array, int size) {
+    if (size < 1) {
+        return 1;
     }
 
-    for (int i = 0, j = 0; i < COUNT_SORT_RANGE_MAX; i++) {
-        while (countArray[i]--) {
-            array[j++] = i;
+    long long elementMax = array[0];
+    long long elementMin = array[0];
+    int* countArray = NULL;
+    for (int i = 1; i < size; i++) {
+        if (elementMax < array[i]) {
+            elementMax = array[i];
+        }
+        if (elementMin > array[i]) {
+            elementMin = array[i];
         }
     }
+
+    size_t countArraySize = elementMax - elementMin + 1;
+    countArray = checkedCalloc(countArraySize, sizeof(int));
+
+    for (size_t i = 0; i < size; i++) {
+        countArray[array[i] - elementMin]++;
+    }
+
+    for (size_t i = 0, j = 0; i < countArraySize; i++) {
+        while (countArray[i]--) {
+            array[j++] = i + elementMin;
+        }
+    }
+    free(countArray);
+    return 0;
 }
