@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -56,4 +57,11 @@ bool testSortingLargeArray(void (*sort)(int*, int)) {
     bool result = isSorted(largeArray, LARGE_ARRAY_SIZE);
     free(largeArray);
     return result;
+}
+
+void testSortingAll(void (*sort)(int*, int)) {
+    assert(testSortingAllEqual(sort));
+    assert(testSortingArrayOfOne(sort));
+    assert(testSortingSorted(sort));
+    assert(testSortingReverseSorted(sort));
 }

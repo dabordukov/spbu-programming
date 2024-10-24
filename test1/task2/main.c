@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -22,20 +21,19 @@ void shellSort(int* array, int size) {
     }
 }
 
-void testAll() {
-    assert(testSortingAllEqual(&shellSort));
-    assert(testSortingArrayOfOne(&shellSort));
-    assert(testSortingSorted(&shellSort));
-    assert(testSortingReverseSorted(&shellSort));
-}
-
 #define N 25
 int main() {
-    testAll();
+    testSortingAll(&shellSort);
     srand(time(NULL));
+
     int array[N] = {0};
     fillArrayRand(array, N, 100);
+
+    printf("Исходный массив:\n");
     printArray(array, N);
+
     shellSort(array, N);
+
+    printf("Отсортированный массив:\n");
     printArray(array, N);
 }
