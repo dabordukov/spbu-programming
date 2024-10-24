@@ -12,14 +12,9 @@ bool doubleMultiplyOverflow(double a, double b) {
 double powLinear(double number, int power, int* error) {
     *error = 0;
     double result = 1;
+    int absPower = abs(power);
 
-    bool reverse = false;
-    if (power < 0) {
-        reverse = true;
-        power = -power;
-    }
-
-    while (power--) {
+    while (absPower--) {
         if (doubleMultiplyOverflow(result, number)) {
             *error = 1;
             return 0;
@@ -28,20 +23,16 @@ double powLinear(double number, int power, int* error) {
         result *= number;
     }
 
-    return (reverse) ? 1 / result : result;
+    return (power < 0) ? 1 / result : result;
 }
 
 double powLogarithmic(double number, int power, int* error) {
     *error = 0;
     double result = 1;
-    bool reverse = false;
-    if (power < 0) {
-        reverse = true;
-        power = -power;
-    }
+    int absPower = abs(power);
 
-    while (power) {
-        if (power % 2) {
+    while (absPower) {
+        if (absPower % 2 == 1) {
             result *= number;
         }
 
@@ -51,8 +42,8 @@ double powLogarithmic(double number, int power, int* error) {
         }
 
         number *= number;
-        power /= 2;
+        absPower /= 2;
     }
 
-    return (reverse) ? 1 / result : result;
+    return (power < 0) ? 1 / result : result;
 }
