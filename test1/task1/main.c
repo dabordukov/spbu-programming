@@ -3,8 +3,10 @@
 #include <stdio.h>
 #include <wchar.h>
 
-bool isPalindrome(wchar_t* string, int size) {
-    int left = 0, right = size - 1;
+bool isPalindrome(wchar_t* string) {
+    int size = wcslen(string);
+    int left = 0;
+    int right = size - 1;
     while (left < right) {
         if (string[left] == L' ') {
             left++;
@@ -27,8 +29,8 @@ bool isPalindrome(wchar_t* string, int size) {
 
 int main() {
     setlocale(LC_ALL, "ru_RU.utf8");
-    wchar_t pal[] = L"я иду с мечем судия";
-    if (isPalindrome(pal, wcslen(pal))) {
+    wchar_t string[] = L"я иду с мечем судия";
+    if (isPalindrome(string)) {
         printf("Palindrome\n");
     }
 }
