@@ -1,5 +1,6 @@
-#ifndef AUX
-#define AUX 1
+#ifndef AUXILIARIES_H
+#define AUXILIARIES_H
+
 #include <stdbool.h>
 
 void swap(int* a, int* b);
