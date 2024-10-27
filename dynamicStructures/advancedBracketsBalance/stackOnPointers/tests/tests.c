@@ -1,7 +1,9 @@
 #include <assert.h>
 #include <stdbool.h>
 
+#include "../functions.h"
 #include "../stack.h"
+
 bool testStackPush() {
     bool passed = true;
     Stack* stack = stackInit();
@@ -40,6 +42,7 @@ bool testStackPop() {
 bool testStackIsEmpty() {
     bool passed = true;
     Stack* stack = stackInit();
+
     if (stackIsEmpty(stack) == false) {
         passed = false;
     }
@@ -53,12 +56,32 @@ bool testStackIsEmpty() {
     if (stackIsEmpty(stack) == false) {
         passed = false;
     }
+
     stackFree(&stack);
     return passed;
+}
+
+bool testIsBracketBalanced() {
+    char testStringsBalanced[6][20] = {"", "qwerty", "qwe{r}ty", "{[{([[]])}]}", "{} [] ()", "{ [ ] } [()]"};
+    char testStringsNotBalanced[3][20] = {"qwe{rty", "}qwerty{", "[ { ( } ) ]"};
+    for (int i = 0; i < 6; i++) {
+        if (isBracketBalanced(testStringsBalanced[i]) != true) {
+            return false;
+        }
+    }
+
+    for (int i = 0; i < 3; i++) {
+        if (isBracketBalanced(testStringsNotBalanced[i]) != false) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool testStackAll() {
     assert(testStackIsEmpty());
     assert(testStackPop());
     assert(testStackPush());
+    assert(testIsBracketBalanced());
 }
