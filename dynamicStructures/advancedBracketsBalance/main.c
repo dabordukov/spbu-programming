@@ -2,8 +2,10 @@
 
 #include "ioAuxiliaries.h"
 #include "stackOnPointers/functions.h"
+#include "stackOnPointers/tests/tests.h"
 
 int main() {
+    testStackAll();
     printf("Введите строку:\n");
 
     char* string = NULL;
