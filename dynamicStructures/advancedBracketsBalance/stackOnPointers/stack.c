@@ -26,6 +26,7 @@ Stack* stackInit() {
     Stack* stack = checkedCalloc(1, sizeof(Stack));
     stack->size = 0;
     stack->top = NULL;
+    return stack;
 }
 
 int stackPush(Stack* stack, int value) {
