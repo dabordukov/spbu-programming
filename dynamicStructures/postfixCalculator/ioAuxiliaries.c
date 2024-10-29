@@ -63,12 +63,11 @@ size_t freadLine(FILE* stream, char** string, int* error) {
             break;
         }
 
-        // memcpy(data + dataSize, buffer, chunkLen);
-        strncpy(data + dataSize, buffer, chunkLen);
+        memcpy(data + dataSize, buffer, chunkLen);
         dataSize += chunkLen;
         countBlocks++;
-        if (buffer[chunkLen - 1] == '\n') {
-            buffer[chunkLen - 1] = 0;
+        if (data[dataSize - 1] == '\n') {
+            data[dataSize - 1] = 0;
             break;
         }
     }
