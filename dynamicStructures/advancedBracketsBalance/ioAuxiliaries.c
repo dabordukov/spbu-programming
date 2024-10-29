@@ -49,6 +49,7 @@ static void* checkedRealloc(void* ptr, size_t size, int* error) {
 
 #define BUFFER_SIZE 8
 size_t freadLine(FILE* stream, char** string, int* error) {
+    *error = 0;
     char buffer[BUFFER_SIZE] = {0};
     int dataSize = 0;
     char* data = NULL;
