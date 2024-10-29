@@ -6,15 +6,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 
-add_executable(testStack tests/tests.c)
+add_executable(testStack tests/tests.c ../postfixCalculatorTokens.c)
 
-add_library(stackOnPointers STATIC stack.c functions.c)
+add_library(stackOnPointers STATIC stack.c)
 target_link_libraries(testStack stackOnPointers)
 
 add_test(NAME "StackOnPointers Test" COMMAND testStack)
-
-add_custom_command(
-    TARGET testStack
-    POST_BUILD
-    COMMAND ${CMAKE_CTEST_COMMAND}
-)

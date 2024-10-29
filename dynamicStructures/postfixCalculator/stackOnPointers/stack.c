@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../postfixCalculatorTokens.h"
+
 static void* checkedCalloc(size_t nmemb, size_t size) {
     void* p = calloc(nmemb, size);
     if (!p) {
@@ -13,7 +15,7 @@ static void* checkedCalloc(size_t nmemb, size_t size) {
 }
 
 struct stackElement {
-    int value;
+    Token data;
     struct stackElement* next;
 };
 
@@ -26,26 +28,27 @@ Stack* stackInit() {
     Stack* stack = checkedCalloc(1, sizeof(Stack));
     stack->size = 0;
     stack->top = NULL;
+    return stack;
 }
 
-int stackPush(Stack* stack, int value) {
+int stackPush(Stack* stack, Token token) {
     struct stackElement* element = checkedCalloc(1, sizeof(struct stackElement));
     element->next = stack->top;
-    element->value = value;
+    element->data = token;
     stack->top = element;
     stack->size++;
 
     return 0;
 }
 
-int stackPop(Stack* stack, int* error) {
+Token stackPop(Stack* stack, int* error) {
     *error = 0;
     if (stack->size == 0) {
         *error = 1;
-        return 0;
+        return NULL_TOKEN;
     }
 
-    int popValue = stack->top->value;
+    Token popValue = stack->top->data;
     struct stackElement* oldElement = stack->top;
     stack->top = oldElement->next;
     stack->size--;
@@ -54,14 +57,14 @@ int stackPop(Stack* stack, int* error) {
     return popValue;
 }
 
-int stackTop(Stack* stack, int* error) {
+Token stackTop(Stack* stack, int* error) {
     *error = 0;
     if (stack->size == 0) {
         *error = 1;
-        return 0;
+        return NULL_TOKEN;
     }
 
-    return stack->top->value;
+    return stack->top->data;
 }
 
 bool stackIsEmpty(Stack* stack) {

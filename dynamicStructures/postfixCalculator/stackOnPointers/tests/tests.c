@@ -2,20 +2,22 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "../functions.h"
+#include "../../postfixCalculatorTokens.h"
 #include "../stack.h"
 
 bool testStackPush() {
     bool passed = true;
     Stack* stack = stackInit();
-    stackPush(stack, 42);
+    Token testToken = (Token){TOKEN_INTEGER, 42};
+    stackPush(stack, testToken);
     int error = 0;
 
-    if (stackTop(stack, &error) != 42 || error != 0) {
+    if (!isEqualToken(stackPop(stack, &error), testToken) || error != 0) {
         passed = false;
     }
-    stackPush(stack, 888);
-    if (stackTop(stack, &error) != 888 || error != 0) {
+    testToken = (Token){TOKEN_PLUS, '+'};
+    stackPush(stack, testToken);
+    if (!isEqualToken(stackTop(stack, &error), testToken) || error != 0) {
         passed = false;
     }
     stackFree(&stack);
@@ -25,14 +27,22 @@ bool testStackPush() {
 bool testStackPop() {
     bool passed = true;
     Stack* stack = stackInit();
-    stackPush(stack, 42);
-    stackPush(stack, 888);
+    Token testToken = (Token){TOKEN_INTEGER, 42};
+    Token testToken2 = (Token){TOKEN_PLUS, '+'};
+
+    stackPush(stack, testToken);
+    stackPush(stack, testToken2);
 
     int error = 0;
-    if (stackPop(stack, &error) != 888 || error != 0) {
+    if (!isEqualToken(stackPop(stack, &error), testToken2) || error != 0) {
         passed = false;
     }
-    if (stackPop(stack, &error) != 42 || error != 0) {
+
+    if (!isEqualToken(stackPop(stack, &error), testToken) || error != 0) {
+        passed = false;
+    }
+
+    if (passed && (!isEqualToken(stackPop(stack, &error), NULL_TOKEN) || error != 1)) {
         passed = false;
     }
 
@@ -47,8 +57,9 @@ bool testStackIsEmpty() {
     if (stackIsEmpty(stack) == false) {
         passed = false;
     }
+    Token testToken = (Token){TOKEN_INTEGER, 42};
 
-    stackPush(stack, 42);
+    stackPush(stack, testToken);
     if (stackIsEmpty(stack) == true) {
         passed = false;
     }
@@ -62,27 +73,8 @@ bool testStackIsEmpty() {
     return passed;
 }
 
-bool testIsBracketBalanced() {
-    char testStringsBalanced[6][20] = {"", "qwerty", "qwe{r}ty", "{[{([[]])}]}", "{} [] ()", "{ [ ] } [()]"};
-    char testStringsNotBalanced[3][20] = {"qwe{rty", "}qwerty{", "[ { ( } ) ]"};
-    for (int i = 0; i < 6; i++) {
-        if (isBracketBalanced(testStringsBalanced[i]) != true) {
-            return false;
-        }
-    }
-
-    for (int i = 0; i < 3; i++) {
-        if (isBracketBalanced(testStringsNotBalanced[i]) != false) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 int main() {
-    assert(testStackIsEmpty());
-    assert(testStackPop());
     assert(testStackPush());
-    assert(testIsBracketBalanced());
+    assert(testStackPop());
+    assert(testStackIsEmpty());
 }
