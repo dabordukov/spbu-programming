@@ -27,13 +27,15 @@ static char* tokenQueueToCharString(Queue* queue) {
         return NULL;
     }
 
-    for (int i = 0; !queueIsEmpty(queue); i++) {
+    int i = 0;
+    for (; !queueIsEmpty(queue); i++) {
         Token token;
         queuePop(queue, &token);
         expression[i] = tokenToChar(token);
         expression[++i] = ' ';
     }
 
+    expression[--i] = 0;
     return expression;
 }
 
