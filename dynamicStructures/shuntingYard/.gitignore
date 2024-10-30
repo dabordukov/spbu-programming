@@ -1,2 +1,3 @@
-stackOnPointers/build/
-build/
+stackOnPointers/build/*
+queue/build/*
+build/*
