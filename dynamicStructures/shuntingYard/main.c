@@ -1,15 +1,22 @@
 #include <stdio.h>
 
+#include "ioAuxiliaries.h"
 #include "shuntingYard.h"
 
 int main() {
     char* out = NULL;
-    char in[] = "2 + 3 + 4";
-    printf("%s\n", in);
+    char* in = NULL;
+    int err = 0;
+    readLine(&in, &err);
+    if (in == NULL) {
+        printf("Не удалось прочитать строку\n");
+        return 1;
+    }
     shuntingYardAlgorithm(in, &out);
 
+    printf("RPN:\n");
     if (out != NULL) {
-        printf("RPN:\n%s\n", out);
+        printf("%s\n", out);
     } else {
         printf("Ошибка..\n");
     }
