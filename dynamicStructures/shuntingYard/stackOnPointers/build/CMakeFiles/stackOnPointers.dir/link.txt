@@ -1,2 +1,0 @@
-/usr/bin/ar qc libstackOnPointers.a CMakeFiles/stackOnPointers.dir/stack.c.o
-/usr/bin/ranlib libstackOnPointers.a
