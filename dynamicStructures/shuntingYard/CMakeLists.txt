@@ -15,10 +15,10 @@ add_subdirectory(stackOnPointers)
 add_subdirectory(queue)
 target_link_libraries(shuntingYard PRIVATE queue PRIVATE stackOnPointers)
 
-# add_executable(testShuntingYard test.c)
-# target_link_libraries(testShuntingYard PRIVATE shuntingYard)
+add_executable(testShuntingYard tests.c)
+target_link_libraries(testShuntingYard PRIVATE shuntingYard)
 
 add_executable(main main.c ioAuxiliaries.c)
 target_link_libraries(main PRIVATE shuntingYard)
 
-# add_test(NAME "Test Shunting Yard" COMMAND testShuntingYard)
+add_test(NAME "Test Shunting Yard" COMMAND testShuntingYard)
