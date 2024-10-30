@@ -1,10 +1,10 @@
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../memoryAuxiliaries.h"
-#include "../tokens.h"
+#include "memoryAuxiliaries.h"
+#include "tokens.h"
+
 struct stackElement {
     Token data;
     struct stackElement* next;

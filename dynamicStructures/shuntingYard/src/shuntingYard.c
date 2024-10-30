@@ -1,7 +1,7 @@
 #include <assert.h>
 
-#include "queue/queue.h"
-#include "stackOnPointers/stack.h"
+#include "queue.h"
+#include "stack.h"
 #include "tokens.h"
 
 static Queue* charStringToTokenQueue(char* string) {

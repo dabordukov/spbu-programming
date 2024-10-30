@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../tokens.h"
+#include "tokens.h"
 typedef struct QueueNode {
     Token token;
     struct QueueNode* next;

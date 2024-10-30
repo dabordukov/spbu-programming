@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 
-#include "../memoryAuxiliaries.h"
-#include "../tokens.h"
+#include "memoryAuxiliaries.h"
+#include "tokens.h"
 
 typedef struct Queue Queue;
 

@@ -2,8 +2,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "../tokens.h"
 #include "queue.h"
+#include "tokens.h"
 
 Queue* testQueueInit() {
     Queue* queue = queueInit();

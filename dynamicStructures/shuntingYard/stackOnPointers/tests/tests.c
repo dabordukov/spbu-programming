@@ -2,8 +2,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "../../tokens.h"
-#include "../stack.h"
+#include "stack.h"
+#include "tokens.h"
 
 bool testStackPush() {
     bool passed = true;
