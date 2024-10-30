@@ -8,14 +8,22 @@
 
 typedef struct Queue Queue;
 
+typedef enum QueueError {
+    QUEUE_OK,
+    QUEUE_IS_EMPTY,
+    QUEUE_NO_MEMORY
+} QueueError;
+
 Queue *queueInit();
 
 int queuePush(Queue *queue, Token token);
 
 int queuePop(Queue *queue, Token *token);
 
-bool isEmpty(Queue *queue);
+bool queueIsEmpty(Queue *queue);
 
-void queueDispose(Queue *queue);
+void queueFree(Queue **queue);
 
+size_t queueSize(Queue *queue);
+void queuePrint(Queue *queue);
 #endif

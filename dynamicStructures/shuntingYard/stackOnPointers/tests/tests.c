@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "../../postfixCalculatorTokens.h"
+#include "../../tokens.h"
 #include "../stack.h"
 
 bool testStackPush() {

@@ -2,7 +2,7 @@
 #define STACK_ON_POINTERS
 #include <stdbool.h>
 
-#include "../postfixCalculatorTokens.h"
+#include "../tokens.h"
 
 typedef struct Stack* Stack;
 

@@ -1,8 +1,8 @@
-#ifndef EXPRESSION_OKENS_H
-#define EXPRESSION_TOKENS_H
+#ifndef TOKENS_H
+#define TOKENS_H
 #include <stdbool.h>
 
-#define NULL_TOKEN ((Token){TOKEN_UNDEFINED, 0})
+#define NULL_TOKEN ((Token){.type = TOKEN_UNDEFINED, .value = 0, .priority = 0})
 
 typedef enum {
     TOKEN_PLUS,
@@ -18,14 +18,17 @@ typedef enum {
 typedef struct {
     TokenType type;
     int value;
+    int priority;
 } Token;
 
-TokenType charToTokenType(int c);
+// TokenType charToTokenType(int c);
 Token charToToken(char c);
+char tokenToChar(Token token);
 bool isTokenOperation(Token token);
 bool isEqualToken(Token a, Token b);
 Token tokenMinusToken(Token a, Token b);
 Token tokenPlusToken(Token a, Token b);
 Token tokenDivToken(Token a, Token b);
 Token tokenMulToken(Token a, Token b);
+int charOperationTokenPriority(char c);
 #endif
