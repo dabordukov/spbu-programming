@@ -1,0 +1,1 @@
+/usr/bin/gcc -g CMakeFiles/testStack.dir/tests/tests.c.o CMakeFiles/testStack.dir/home/zst/spbu/programming/dynamicStructures/postfixCalculator/postfixCalculatorTokens.c.o -o bin/testStack  libstackOnPointers.a 

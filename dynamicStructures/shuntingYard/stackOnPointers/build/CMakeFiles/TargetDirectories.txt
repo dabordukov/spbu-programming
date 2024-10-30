@@ -1,0 +1,5 @@
+/home/zst/spbu/programming/dynamicStructures/postfixCalculator/stackOnPointers/build/CMakeFiles/testStack.dir
+/home/zst/spbu/programming/dynamicStructures/postfixCalculator/stackOnPointers/build/CMakeFiles/stackOnPointers.dir
+/home/zst/spbu/programming/dynamicStructures/postfixCalculator/stackOnPointers/build/CMakeFiles/test.dir
+/home/zst/spbu/programming/dynamicStructures/postfixCalculator/stackOnPointers/build/CMakeFiles/edit_cache.dir
+/home/zst/spbu/programming/dynamicStructures/postfixCalculator/stackOnPointers/build/CMakeFiles/rebuild_cache.dir
