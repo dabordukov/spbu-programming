@@ -2,7 +2,6 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct ListNode {
@@ -59,7 +58,7 @@ void* listPosGetData(ListPosition* pos) {
 
 ListPosition* listInsertAfterWithDestructor(List* list, void* data, ListPosition* pos, void (*dataDestructor)(void*)) {
     ListNode* newNode = createNode(data, dataDestructor);
-    if (listIsEmpty) {
+    if (listIsEmpty(list)) {
         list->first = newNode;
         list->last = newNode;
         list->size++;
@@ -185,7 +184,6 @@ void listPrint(List* list, void (*printData)(void*)) {
 void listFree(List** list) {
     while (!listIsEmpty(*list)) {
         ListPosition* last = (*list)->last;
-        printf("REMOVED %s\n", (char*)listPosGetData(last));
         listRemoveNode(*list, &last);
     }
 
