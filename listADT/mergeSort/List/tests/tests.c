@@ -59,6 +59,8 @@ void testListFind() {
     ASSERT_STR(listPosGetData(listFindData(list, "9", &compareSTR)), "9");
     ASSERT_STR(listPosGetData(listFindData(list, "4", &compareSTR)), "4");
     assert(listFindData(list, "11", &compareSTR) == NULL);
+
+    listFree(&list);
 }
 
 void testListRemoveNode() {
@@ -112,6 +114,8 @@ void testListRemoveNode() {
         assert(listNextNode(list, prev) == next);
         assert(listLast(list) == prev);
     }
+
+    listFree(&list);
 }
 
 int main() {
