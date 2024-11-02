@@ -10,9 +10,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -g")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
-# add_executable(testList ${TESTS_PATH}/tests.c)
-# add_test(NAME "List test" COMMAND testList)
+add_executable(testList ${TESTS_PATH}/tests.c)
+add_test(NAME "List test" COMMAND testList)
 
 add_library(list STATIC ${PROJECT_SOURCES}/list.c)
-# target_link_libraries(testList list)
-
+target_link_libraries(testList list)
