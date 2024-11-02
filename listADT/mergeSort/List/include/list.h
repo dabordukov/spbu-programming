@@ -5,8 +5,8 @@
 
 typedef struct List List;
 
-/*pointer to the list node*/
 typedef void ListPosition;
+/*pointer to the list node*/
 typedef ListPosition* pListPos;
 
 /* free() is set to default destructor for deleting data from list nodes*/
