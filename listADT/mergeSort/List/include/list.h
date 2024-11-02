@@ -58,7 +58,7 @@ ListPosition* listInsertAfterWithDestructor(List* list, void* data, ListPosition
 /* Insert node with DATA and custom dataDestructor in the end of the lists*/
 ListPosition* listAppendWithDestructor(List* list, void* data, void (*dataDestructor)(void*));
 
-/* Deletete node from list*/
+/* Delete node from list*/
 void listRemoveNode(List* list, ListPosition** pos);
 
 void listPrint(List* list, void (*printData)(void*));

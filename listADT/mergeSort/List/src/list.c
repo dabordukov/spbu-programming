@@ -145,7 +145,7 @@ ListPosition* listPrevNode(List* list, ListPosition* pos) {
     return NULL;
 }
 
-/* Deletete node from list*/
+/* Delete node from list*/
 void listRemoveNode(List* list, ListPosition** pos) {
     if (*pos == NULL) {
         return;
