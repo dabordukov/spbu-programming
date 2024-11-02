@@ -132,7 +132,7 @@ ListPosition* listNextNode(List* list, ListPosition* pos) {
 /*Returns NULL if there is no POS node in list or POS node is the first node
   Otherwise return position of the node previous to POS node*/
 ListPosition* listPrevNode(List* list, ListPosition* pos) {
-    if (listIsEmpty(list)) {
+    if (listIsEmpty(list) || pos == NULL) {
         return NULL;
     }
 
