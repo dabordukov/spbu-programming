@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct ListNode {
@@ -196,4 +197,86 @@ ListPosition* listFirst(List* list) {
 
 ListPosition* listLast(List* list) {
     return list->last;
+}
+
+size_t listPosMove(ListPosition** pos, size_t steps) {
+    if (*pos == NULL) {
+        return 0;
+    }
+
+    int countSteps = 0;
+    for (; countSteps < steps; countSteps++) {
+        if ((*pos)->next != NULL) {
+            *pos = (*pos)->next;
+        } else {
+            break;
+        }
+    }
+
+    return countSteps;
+}
+
+static void swapNodes(List* list, ListPosition* a, ListPosition* b) {
+    if (a == b) {
+        return;
+    }
+
+    assert(a != NULL && b != NULL);
+
+    void* dataTemp = a->data;
+    a->data = b->data;
+    b->data = dataTemp;
+
+    void (*destructorTemp)(void*) = a->dataDestructor;
+    a->dataDestructor = b->dataDestructor;
+    b->dataDestructor = destructorTemp;
+}
+
+static void mergeSort(List* list, bool (*compareData)(void*, void*), ListPosition* pos, size_t subListSize) {
+    if (subListSize <= 1) {
+        return;
+    }
+    size_t secondSubListSize = subListSize - subListSize / 2;
+    mergeSort(list, compareData, pos, subListSize / 2);
+    ListPosition* subListMid = pos;
+    assert(listPosMove(&subListMid, subListSize / 2) == subListSize / 2);
+    mergeSort(list, compareData, subListMid, secondSubListSize);
+
+    ListPosition* ptr1 = pos;
+    ListPosition* ptr2 = subListMid;
+    ListPosition* end = subListMid;
+    if (listPosMove(&end, secondSubListSize) < secondSubListSize) {
+        end = NULL;
+    }
+    if (subListSize == 13) {
+        printf("13");
+    }
+    while (ptr1 != ptr2 && ptr2 != end) {
+        if (!compareData(ptr1->data, ptr2->data)) {
+            swapNodes(list, ptr1, ptr2);
+            listPrint(list, &puts);
+            puts("");
+        }
+        ptr1 = ptr1->next;
+    }
+}
+
+void listMergeSort(List* list, bool (*compareData)(void*, void*)) {
+    if (list != NULL) {
+        mergeSort(list, compareData, list->first, list->size);
+    }
+}
+
+bool listIsSorted(List* list, bool (*compareData)(void*, void*)) {
+    if (list->size < 2) {
+        return true;
+    }
+
+    for (ListPosition* pos = list->first; pos->next != NULL; pos = pos->next) {
+        if (!compareData(pos->data, pos->next->data)) {
+            return false;
+        }
+    }
+
+    return true;
 }
