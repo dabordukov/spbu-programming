@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void flushSTDIN() {
-    int c;
+void flushSTDIN(void) {
+    int c = EOF;
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
@@ -40,7 +40,7 @@ static void* checkedRealloc(void* ptr, size_t size, int* error) {
     *error = 0;
 
     void* p = realloc(ptr, size);
-    if (!p) {
+    if (p == NULL) {
         *error = 1;
     }
 
@@ -48,9 +48,9 @@ static void* checkedRealloc(void* ptr, size_t size, int* error) {
 }
 
 #define BUFFER_SIZE 8
-size_t freadLine(FILE* stream, char** string, int* error) {
+size_t fReadLine(FILE* stream, char** string, int* error) {
     *error = 0;
-    char buffer[BUFFER_SIZE] = {0};
+    char buffer[BUFFER_SIZE] = {'\0'};
     int dataSize = 0;
     char* data = NULL;
     int errorRealloc = 0;
@@ -67,7 +67,7 @@ size_t freadLine(FILE* stream, char** string, int* error) {
         dataSize += chunkLen;
         countBlocks++;
         if (data[dataSize - 1] == '\n') {
-            data[dataSize - 1] = 0;
+            data[dataSize - 1] = '0';
             break;
         }
     }
@@ -81,5 +81,5 @@ size_t freadLine(FILE* stream, char** string, int* error) {
 }
 
 size_t readLine(char** string, int* error) {
-    return freadLine(stdin, string, error);
+    return fReadLine(stdin, string, error);
 }

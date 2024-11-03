@@ -22,5 +22,6 @@ size_t readLine(char** string, int* error);
    sets STRING pointer to new string
    sets ERROR to 1 on allocation errors
    returns length of new string*/
-size_t freadLine(FILE* stream, char** string, int* error);
+size_t fReadLine(FILE* stream, char** string, int* error);
+
 #endif
