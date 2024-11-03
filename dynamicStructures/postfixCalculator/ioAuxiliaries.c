@@ -10,32 +10,6 @@ void flushSTDIN(void) {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-size_t freadLineN(FILE* stream, char* string, size_t size) {
-    size_t count = 0;
-    size--;  // leave one byte for terminator
-    int c = EOF;
-
-    while (size-- && (c = fgetc(stream)) != '\n' && c != EOF) {
-        if (c == '\r') {
-            size++;
-            continue;
-        }
-
-        string[count++] = c;
-    }
-    string[count] = 0;  // terminator
-
-    if (stream == stdin && c != '\n' && c != EOF) {
-        flushSTDIN();
-    }
-
-    return count;
-}
-
-size_t readLineN(char* string, size_t size) {
-    return freadLineN(stdin, string, size);
-}
-
 static void* checkedRealloc(void* ptr, size_t size, int* error) {
     *error = 0;
 

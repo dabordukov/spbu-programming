@@ -4,13 +4,6 @@
 #include <stdlib.h>
 
 void flushSTDIN();
-/* Read from stdin until newline, not more than SIZE-1 chars and write to STRING.
-   Return number of chars written to STRING. */
-size_t readLineN(char* string, size_t size);
-
-/* Read from STREAM until newline, not more than SIZE-1 chars and write to STRING.
-   Return number of chars written to STRING. */
-size_t freadLineN(FILE* stream, char* string, size_t size);
 
 /* read from stdin until newline or EOF
    sets STRING pointer to new string
