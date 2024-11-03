@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* Clear stdin until '\n' or EOF*/
 void flushSTDIN();
 
 /* read from stdin until newline or EOF
