@@ -43,6 +43,11 @@ void testListAppendInsert() {
     ASSERT_STR(listPosGetData(listNextNode(list, first)), "44");
 
     listFree(&list);
+
+    list = listInitWithDestructor(&nothing);
+    listInsertAfter(list, "1", NULL);
+    ASSERT_STR(listPosGetData(listFirst(list)), "1");
+    listFree(&list);
 }
 
 void testListFind() {
