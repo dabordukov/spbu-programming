@@ -9,12 +9,77 @@ void printStr(void* data) {
     puts((const char*)data);
 }
 
-bool compareSTR(void* data1, void* data2) {
+bool equalStr(void* data1, void* data2) {
     return strcmp((const char*)data1, (const char*)data2) == 0;
 }
 
-void nothing() {
+bool compareStrAscending(void* dataL, void* dataR) {
+    return strcmp((const char*)dataL, (const char*)dataR) <= 0;
+}
+
+void nothing(void* data) {
     return;
+}
+
+void testCaseSortedList() {
+    List* list = listInitWithDestructor(&nothing);
+
+    listAppend(list, "1");
+    listMergeSort(list, &compareStrAscending);
+    assert(listIsSorted(list, compareStrAscending));
+
+    listAppend(list, "2");
+    listMergeSort(list, &compareStrAscending);
+    assert(listIsSorted(list, compareStrAscending));
+
+    listAppend(list, "3");
+    listMergeSort(list, &compareStrAscending);
+    assert(listIsSorted(list, compareStrAscending));
+
+    char str[10][3];
+    for (int i = 4; i < 14; i++) {
+        sprintf(str[i - 4], "%d", i);
+        listAppend(list, str[i - 4]);
+    }
+
+    listMergeSort(list, &compareStrAscending);
+    // listPrint(list, &puts);
+    // fflush(stdout);
+
+    assert(listIsSorted(list, compareStrAscending));
+
+    listFree(&list);
+}
+
+void testCaseReverseSortedList() {
+    List* list = listInitWithDestructor(&nothing);
+
+    char str[100][3];
+    for (int i = 99; i >= 0; i--) {
+        sprintf(str[i], "%d", i);
+        listAppend(list, str[i]);
+    }
+
+    listMergeSort(list, &compareStrAscending);
+    assert(listIsSorted(list, compareStrAscending));
+    listFree(&list);
+}
+
+void testCaseRandomData() {
+    List* list = listInitWithDestructor(&nothing);
+    FILE* testFile = fopen(RANDOM_DATA_PATH, "r");
+    assert(testFile != NULL);
+    char numbers[1000][5];
+    for (int i = 0; i < 1000; i++) {
+        fscanf(testFile, "%4s", numbers[i]);
+        listAppend(list, &(numbers[i]));
+    }
+
+    fclose(testFile);
+
+    listMergeSort(list, &compareStrAscending);
+    assert(listIsSorted(list, &compareStrAscending));
+    listFree(&list);
 }
 
 #define ASSERT_STR(x, y) assert(strcmp((char*)x, (char*)y) == 0)
@@ -44,15 +109,18 @@ void testListAppendInsert() {
 
     listFree(&list);
 
-    list = listInitWithDestructor(&nothing);
-    listInsertAfter(list, "1", NULL);
+    list = listInit();
+    listInsertAfterWithDestructor(list, "1", NULL, &nothing);
     ASSERT_STR(listPosGetData(listFirst(list)), "1");
+
+    listInsertAfterWithDestructor(list, "1337", listLast(list), &nothing);
+    ASSERT_STR(listPosGetData(listLast(list)), "1337");
     listFree(&list);
 }
 
 void testListFind() {
     List* list = listInitWithDestructor(&nothing);
-    assert(listFindData(list, "1", &compareSTR) == NULL);
+    assert(listFindData(list, "1", &equalStr) == NULL);
 
     char str[10][2];
     for (int i = 0; i < 10; i++) {
@@ -60,10 +128,61 @@ void testListFind() {
         listAppend(list, str[i]);
     }
 
-    ASSERT_STR(listPosGetData(listFindData(list, "0", &compareSTR)), "0");
-    ASSERT_STR(listPosGetData(listFindData(list, "9", &compareSTR)), "9");
-    ASSERT_STR(listPosGetData(listFindData(list, "4", &compareSTR)), "4");
-    assert(listFindData(list, "11", &compareSTR) == NULL);
+    ASSERT_STR(listPosGetData(listFindData(list, "0", &equalStr)), "0");
+    ASSERT_STR(listPosGetData(listFindData(list, "9", &equalStr)), "9");
+    ASSERT_STR(listPosGetData(listFindData(list, "4", &equalStr)), "4");
+    assert(listFindData(list, "11", &equalStr) == NULL);
+
+    listFree(&list);
+}
+
+void testListMisc() {
+    List* list = listInitWithDestructor(&nothing);
+
+    char str[10][2];
+    for (int i = 0; i < 10; i++) {
+        sprintf(str[i], "%d", i);
+        listAppend(list, str[i]);
+    }
+
+    // lisPosMove test
+    {
+        ListPosition* node = listFindData(list, "0", &equalStr);
+        ListPosition* step1 = listFindData(list, "1", &equalStr);
+        ListPosition* step2more = listFindData(list, "3", &equalStr);
+        ListPosition* lastNode = listFindData(list, "9", &equalStr);
+
+        assert(listPosMove(&node, 1) == 1);
+        assert(step1 == node);
+        assert(listPosMove(&node, 2) == 2);
+        assert(step2more == node);
+        assert(listPosMove(&node, 15) == 6);
+        assert(lastNode == node);
+
+        node = NULL;
+        assert(listPosMove(&node, 1) == 0);
+        assert(node == NULL);
+    }
+
+    // listNextNode listPrevNode tests
+    {
+        assert(listNextNode(NULL) == NULL);
+        assert(listPrevNode(list, NULL) == NULL);
+
+        assert(listNextNode(listLast(list)) == NULL);
+        assert(listPrevNode(list, listFirst(list)) == NULL);
+
+        assert(listNextNode(listFindData(list, "0", &equalStr)) == listFindData(list, "1", &equalStr));
+        assert(listPrevNode(list, listFindData(list, "6", &equalStr)) == listFindData(list, "5", &equalStr));
+    }
+
+    // listGetPosData tests
+    {
+        assert(listPosGetData(NULL) == NULL);
+        assert(listPosGetData(listFirst(list)) == str[0]);
+        assert(listPosGetData(listLast(list)) == str[9]);
+        assert(listPosGetData(listPrevNode(list, listLast(list))) == str[8]);
+    }
 
     listFree(&list);
 }
@@ -77,14 +196,21 @@ void testListRemoveNode() {
         listAppend(list, str[i]);
     }
 
+    {
+        ListPosition* nullNode = NULL;
+        size_t listSizeTmp = listSize(list);
+        listRemoveNode(list, &nullNode);
+        assert(listSize(list) == listSizeTmp);
+    }
+
     // mid element
     {
-        pListPos find = listFindData(list, "5", &compareSTR);
+        pListPos find = listFindData(list, "5", &equalStr);
         pListPos prev = listPrevNode(list, find);
         pListPos next = listNextNode(find);
         listRemoveNode(list, &find);
         assert(find == NULL);
-        assert(listFindData(list, "5", &compareSTR) == NULL);
+        assert(listFindData(list, "5", &equalStr) == NULL);
 
         // checks that .next pointer was set correctly
         assert(listPrevNode(list, next) == prev);
@@ -93,12 +219,12 @@ void testListRemoveNode() {
 
     // first element
     {
-        pListPos find = listFindData(list, "0", &compareSTR);
+        pListPos find = listFindData(list, "0", &equalStr);
         pListPos prev = listPrevNode(list, find);
         pListPos next = listNextNode(find);
         listRemoveNode(list, &find);
         assert(find == NULL);
-        assert(listFindData(list, "0", &compareSTR) == NULL);
+        assert(listFindData(list, "0", &equalStr) == NULL);
 
         // checks that .first pointer was set correctly
         assert(listFirst(list) == next);
@@ -107,12 +233,12 @@ void testListRemoveNode() {
 
     // last element
     {
-        pListPos find = listFindData(list, "9", &compareSTR);
+        pListPos find = listFindData(list, "9", &equalStr);
         pListPos prev = listPrevNode(list, find);
         pListPos next = listNextNode(find);
         listRemoveNode(list, &find);
         assert(find == NULL);
-        assert(listFindData(list, "9", &compareSTR) == NULL);
+        assert(listFindData(list, "9", &equalStr) == NULL);
 
         // checks that .next and .last pointers were set correctly
         assert(next == NULL);
@@ -127,5 +253,10 @@ int main() {
     testListInitFree();
     testListAppendInsert();
     testListFind();
+    testListMisc();
     testListRemoveNode();
+
+    testCaseSortedList();
+    testCaseReverseSortedList();
+    testCaseRandomData();
 }
