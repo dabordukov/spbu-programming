@@ -216,55 +216,63 @@ size_t listPosMove(ListPosition** pos, size_t steps) {
     return countSteps;
 }
 
-static void swapNodes(List* list, ListPosition* a, ListPosition* b) {
-    if (a == b) {
-        return;
+ListPosition* mergeSubLists(ListPosition* first, ListPosition* second, bool (*compareData)(void*, void*)) {
+    if (first == NULL) {
+        return second;
+    }
+    if (second == NULL || first == second) {
+        return first;
     }
 
-    assert(a != NULL && b != NULL);
-
-    void* dataTemp = a->data;
-    a->data = b->data;
-    b->data = dataTemp;
-
-    void (*destructorTemp)(void*) = a->dataDestructor;
-    a->dataDestructor = b->dataDestructor;
-    b->dataDestructor = destructorTemp;
+    if (compareData(first->data, second->data)) {
+        first->next = mergeSubLists(first->next, second, compareData);
+        return first;
+    } else {
+        second->next = mergeSubLists(first, second->next, compareData);
+        return second;
+    }
 }
 
-static void mergeSort(List* list, bool (*compareData)(void*, void*), ListPosition* pos, size_t subListSize) {
-    if (subListSize <= 1) {
-        return;
-    }
-    size_t secondSubListSize = subListSize - subListSize / 2;
-    mergeSort(list, compareData, pos, subListSize / 2);
-    ListPosition* subListMid = pos;
-    assert(listPosMove(&subListMid, subListSize / 2) == subListSize / 2);
-    mergeSort(list, compareData, subListMid, secondSubListSize);
+ListPosition* splitList(ListPosition* pos) {
+    ListPosition* slow = pos;
+    ListPosition* fast = pos;
 
-    ListPosition* ptr1 = pos;
-    ListPosition* ptr2 = subListMid;
-    ListPosition* end = subListMid;
-    if (listPosMove(&end, secondSubListSize) < secondSubListSize) {
-        end = NULL;
-    }
-    if (subListSize == 13) {
-        printf("13");
-    }
-    while (ptr1 != ptr2 && ptr2 != end) {
-        if (!compareData(ptr1->data, ptr2->data)) {
-            swapNodes(list, ptr1, ptr2);
-            listPrint(list, &puts);
-            puts("");
+    while (fast != NULL && fast->next != NULL) {
+        fast = fast->next->next;
+        if (fast != NULL) {
+            slow = slow->next;
         }
-        ptr1 = ptr1->next;
     }
+
+    assert(slow != NULL);
+    ListPosition* secondSubList = slow->next;
+    slow->next = NULL;
+    return secondSubList;
+}
+
+static ListPosition* mergeSort(ListPosition* startNode, bool (*compareData)(void*, void*)) {
+    if (startNode == NULL || startNode->next == NULL) {
+        return startNode;
+    }
+
+    ListPosition* midNode = splitList(startNode);
+    startNode = mergeSort(startNode, compareData);
+    midNode = mergeSort(midNode, compareData);
+
+    return mergeSubLists(startNode, midNode, compareData);
 }
 
 void listMergeSort(List* list, bool (*compareData)(void*, void*)) {
-    if (list != NULL) {
-        mergeSort(list, compareData, list->first, list->size);
+    if (list == NULL) {
+        return;
     }
+    ListPosition* node = mergeSort(list->first, compareData);
+    list->first = node;
+
+    while (node->next != NULL) {
+        node = node->next;
+    }
+    list->last = node;
 }
 
 bool listIsSorted(List* list, bool (*compareData)(void*, void*)) {

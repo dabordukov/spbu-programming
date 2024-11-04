@@ -47,6 +47,11 @@ ListPosition* listNextNode(List* list, ListPosition* pos);
    If not found return NULL */
 ListPosition* listFindData(List* list, void* data, bool (*compareData)(void*, void*));
 
+/* Move POS pointer next STEPS times
+   Return number of successful steps,
+   return value is less than passed STEPS parameter if the list end is encountered*/
+size_t listPosMove(ListPosition** pos, size_t steps);
+
 /* Insert node with DATA after the POS node
    If pos==NULL, insert node in the beginning of the list*/
 ListPosition* listInsertAfter(List* list, void* data, ListPosition* pos);
@@ -61,6 +66,17 @@ ListPosition* listAppendWithDestructor(List* list, void* data, void (*dataDestru
 /* Delete node from list*/
 void listRemoveNode(List* list, ListPosition** pos);
 
+/* Applies printData(void*) to data in every node*/
 void listPrint(List* list, void (*printData)(void*));
+
+/* Check if list is sorted
+   Checks data order with bool compareData(void* dataLeft, void* dataRight),
+    which should return true on the right order and false on wrong*/
+bool listIsSorted(List* list, bool (*compareData)(void*, void*));
+
+/* Sort list with mergeSort
+   Checks data order with bool compareData(void* dataLeft, void* dataRight),
+    which should return true on the right order and false on wrong*/
+void listMergeSort(List* list, bool (*compareData)(void*, void*));
 
 #endif
