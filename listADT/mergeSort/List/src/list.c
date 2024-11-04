@@ -120,9 +120,9 @@ ListPosition* listFindData(List* list, void* data, bool (*compareData)(void*, vo
     return (ListPosition*)iter;
 }
 
-/*Returns NULL if there is no POS node in list or POS node is the last node
+/*Returns NULL if POS node is NULL or POS node is the last node
   Otherwise return position of the node next to POS node*/
-ListPosition* listNextNode(List* list, ListPosition* pos) {
+ListPosition* listNextNode(ListPosition* pos) {
     if (pos == NULL) {
         return NULL;
     }

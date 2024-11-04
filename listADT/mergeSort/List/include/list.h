@@ -38,9 +38,9 @@ ListPosition* listLast(List* list);
    Otherwise return position of the node previous to POS node*/
 ListPosition* listPrevNode(List* list, ListPosition* pos);
 
-/*Returns NULL if there is no POS node in list or POS node is the last node
-  Otherwise return position of the node next to POS node*/
-ListPosition* listNextNode(List* list, ListPosition* pos);
+//*Returns NULL if POS node is NULL or POS node is the last node
+Otherwise return position of the node next to POS node * /
+    ListPosition * listNextNode(ListPosition * pos);
 
 /* Search node with data equals DATA. Compare equality with compareData function.
    Return position of the first such node

@@ -32,15 +32,15 @@ void testListAppendInsert() {
 
     pListPos first = listAppend(list, "1234");
     pListPos second = listAppend(list, "5678");
-    listInsertAfter(list, "999", listNextNode(list, second));  // pos==NULL
+    listInsertAfter(list, "999", listNextNode(second));  // pos==NULL
     ASSERT_STR(listPosGetData(first), "1234");
     ASSERT_STR(listPosGetData(second), "5678");
 
-    ASSERT_STR(listPosGetData(listNextNode(list, first)), "5678");
+    ASSERT_STR(listPosGetData(listNextNode(first)), "5678");
     ASSERT_STR(listPosGetData(listPrevNode(list, second)), "1234");
     ASSERT_STR(listPosGetData(listFirst(list)), "999");
     listInsertAfter(list, "44", first);
-    ASSERT_STR(listPosGetData(listNextNode(list, first)), "44");
+    ASSERT_STR(listPosGetData(listNextNode(first)), "44");
 
     listFree(&list);
 
@@ -81,21 +81,21 @@ void testListRemoveNode() {
     {
         pListPos find = listFindData(list, "5", &compareSTR);
         pListPos prev = listPrevNode(list, find);
-        pListPos next = listNextNode(list, find);
+        pListPos next = listNextNode(find);
         listRemoveNode(list, &find);
         assert(find == NULL);
         assert(listFindData(list, "5", &compareSTR) == NULL);
 
         // checks that .next pointer was set correctly
         assert(listPrevNode(list, next) == prev);
-        assert(listNextNode(list, prev) == next);
+        assert(listNextNode(prev) == next);
     }
 
     // first element
     {
         pListPos find = listFindData(list, "0", &compareSTR);
         pListPos prev = listPrevNode(list, find);
-        pListPos next = listNextNode(list, find);
+        pListPos next = listNextNode(find);
         listRemoveNode(list, &find);
         assert(find == NULL);
         assert(listFindData(list, "0", &compareSTR) == NULL);
@@ -109,14 +109,14 @@ void testListRemoveNode() {
     {
         pListPos find = listFindData(list, "9", &compareSTR);
         pListPos prev = listPrevNode(list, find);
-        pListPos next = listNextNode(list, find);
+        pListPos next = listNextNode(find);
         listRemoveNode(list, &find);
         assert(find == NULL);
         assert(listFindData(list, "9", &compareSTR) == NULL);
 
         // checks that .next and .last pointers were set correctly
         assert(next == NULL);
-        assert(listNextNode(list, prev) == next);
+        assert(listNextNode(prev) == next);
         assert(listLast(list) == prev);
     }
 
