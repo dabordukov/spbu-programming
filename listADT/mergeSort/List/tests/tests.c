@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/list.h"
+#include "list.h"
 
 void printStr(void* data) {
     puts((const char*)data);
