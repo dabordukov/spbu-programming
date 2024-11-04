@@ -71,7 +71,7 @@ void testCaseRandomData() {
     assert(testFile != NULL);
     char numbers[1000][5];
     for (int i = 0; i < 1000; i++) {
-        fscanf(testFile, "%4s", numbers[i]);
+        assert(fscanf(testFile, "%4s", numbers[i]) > 0);
         listAppend(list, &(numbers[i]));
     }
 
