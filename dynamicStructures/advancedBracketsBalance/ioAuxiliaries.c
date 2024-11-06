@@ -10,39 +10,28 @@ void flushSTDIN(void) {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-static void* checkedRealloc(void* ptr, size_t size, int* error) {
-    *error = 0;
-
-    void* p = realloc(ptr, size);
-    if (p == NULL) {
-        *error = 1;
-    }
-
-    return p;
-}
-
-#define BUFFER_SIZE 8
+#define BUFFER_SIZE 4096
 size_t fReadLine(FILE* stream, char** string, int* error) {
     *error = 0;
     char buffer[BUFFER_SIZE] = {'\0'};
     int dataSize = 0;
     char* data = NULL;
-    int errorRealloc = 0;
 
-    int countBlocks = 0;
     while (fgets(buffer, BUFFER_SIZE, stream) != NULL) {
         int chunkLen = strlen(buffer);
-        data = checkedRealloc(data, dataSize + chunkLen + 1, &errorRealloc);
-        if (errorRealloc) {
+        char* newData = realloc(data, dataSize + chunkLen + 1);
+        if (newData == NULL) {
             break;
         }
+        data = newData;
 
         memcpy(data + dataSize, buffer, chunkLen);
         dataSize += chunkLen;
-        countBlocks++;
         if (data[dataSize - 1] == '\n') {
             data[dataSize - 1] = '\0';
             break;
+        } else {
+            data[dataSize] = '\0';
         }
     }
 
@@ -51,7 +40,7 @@ size_t fReadLine(FILE* stream, char** string, int* error) {
     }
 
     *string = data;
-    return dataSize - 1;
+    return dataSize;
 }
 
 size_t readLine(char** string, int* error) {
