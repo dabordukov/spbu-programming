@@ -9,7 +9,11 @@ void printUsage(char* filename) {
 }
 
 int main(int argc, char* argv[]) {
+#ifdef _WIN
+    setlocale(LC_CTYPE, "Ru.UTF-8");
+#else
     setlocale(LC_CTYPE, "");
+#endif
     List* entries = NULL;
     if (argc == 3) {
         entries = readEntriesToList(argv[2]);
