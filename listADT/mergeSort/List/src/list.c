@@ -46,6 +46,10 @@ size_t listSize(List* list) {
 }
 
 bool listIsEmpty(List* list) {
+    if (list == NULL) {
+        return true;
+    }
+
     return list->size == 0;
 }
 
