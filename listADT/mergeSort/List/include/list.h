@@ -2,6 +2,7 @@
 #define LIST_H
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 typedef struct List List;
 
@@ -68,6 +69,8 @@ void listRemoveNode(List* list, ListPosition** pos);
 
 /* Applies printData(void*) to data in every node*/
 void listPrint(List* list, void (*printData)(void*));
+/* Applies printData(FILE*, void*) to data in every node*/
+void listPrintStream(List* list, void (*printData)(FILE*, void*), FILE* stream);
 
 /* Check if list is sorted
    Checks data order with bool compareData(void* dataLeft, void* dataRight),

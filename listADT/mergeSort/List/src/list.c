@@ -185,6 +185,16 @@ void listPrint(List* list, void (*printData)(void*)) {
     }
 }
 
+void listPrintStream(List* list, void (*printData)(FILE*, void*), FILE* stream) {
+    if (listIsEmpty(list)) {
+        return;
+    }
+
+    for (ListPosition* iter = list->first; iter != NULL; iter = iter->next) {
+        printData(stream, iter->data);
+    }
+}
+
 void listFree(List** list) {
     while (!listIsEmpty(*list)) {
         ListPosition* last = (*list)->last;
