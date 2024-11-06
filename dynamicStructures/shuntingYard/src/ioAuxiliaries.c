@@ -41,7 +41,7 @@ size_t fReadLine(FILE* stream, char** string, int* error) {
         dataSize += chunkLen;
         countBlocks++;
         if (data[dataSize - 1] == '\n') {
-            data[dataSize - 1] = '0';
+            data[dataSize - 1] = '\0';
             break;
         }
     }
