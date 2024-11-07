@@ -6,7 +6,9 @@
 
 typedef struct List List;
 
+#ifndef INTERNALS_CIRCULAR_LIST_H
 typedef void ListPosition;
+#endif
 /*pointer to the list node*/
 typedef ListPosition* pListPos;
 

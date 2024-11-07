@@ -10,7 +10,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 # project library
-add_library(list STATIC ${PROJECT_SOURCES}/list.c)
+add_library(list STATIC ${PROJECT_SOURCES}/list.c ${PROJECT_SOURCES}/circularList.c)
 
 # tests
 add_executable(testList ${TESTS_PATH}/tests.c )
