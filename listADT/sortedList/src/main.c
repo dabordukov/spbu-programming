@@ -1,3 +1,4 @@
+#include <locale.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -116,6 +117,13 @@ int menu() {
 }
 
 int main() {
+#ifdef _WIN32
+    system("chcp 65001");
+    setlocale(LC_CTYPE, "Ru.UTF-8");
+#else
+    setlocale(LC_CTYPE, "");
+#endif
+
     list = listInitWithDestructor(&nothing);
 
     alternateBuffer();
