@@ -185,7 +185,7 @@ size_t circListPosMove(CircListPosition** pos, size_t steps) {
         return 0;
     }
 
-    for (int countSteps = 0; countSteps < steps; countSteps++) {
+    for (size_t countSteps = 0; countSteps < steps; countSteps++) {
         (*pos) = (*pos)->next;
     }
 
