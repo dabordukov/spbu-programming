@@ -17,7 +17,7 @@ void printListInt(void* data) {
     printf("%ld ", (intptr_t)data);
 }
 
-void nothing(void*) {
+void nothing(void* data) {
     return;
 }
 
