@@ -218,7 +218,7 @@ size_t listPosMove(ListPosition** pos, size_t steps) {
         return 0;
     }
 
-    int countSteps = 0;
+    size_t countSteps = 0;
     for (; countSteps < steps; countSteps++) {
         if ((*pos)->next != NULL) {
             *pos = (*pos)->next;
