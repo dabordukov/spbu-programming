@@ -43,8 +43,6 @@ void testCaseSortedList() {
     }
 
     listMergeSort(list, &compareStrAscending);
-    // listPrint(list, &puts);
-    // fflush(stdout);
 
     assert(listIsSorted(list, compareStrAscending));
 
