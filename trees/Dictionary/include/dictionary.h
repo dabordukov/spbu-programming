@@ -3,13 +3,7 @@
 
 #include <stdbool.h>
 
-// typedef void Dictionary;
-typedef struct TreeNode {
-    struct TreeNode* left;
-    struct TreeNode* right;
-    char* string;
-    int key;
-} Dictionary;
+typedef struct dictionary Dictionary;
 
 int dictionaryInsert(Dictionary** root, int key, char* string);
 void dictionaryEntryRemove(Dictionary** root, int key);
