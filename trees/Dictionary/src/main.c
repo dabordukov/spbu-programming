@@ -95,6 +95,7 @@ void removeEntry() {
         printf("Введите ключ: ");
         scanned = scanf("%d", &key);
     } while (scanned != 1);
+    flushSTDIN();
 
     dictionaryEntryRemove(&dictionary, key);
     printf("Удалено\n");
@@ -104,10 +105,9 @@ int menu() {
     char userChoice = 0;
     while (userChoice != '0') {
         puts(menuMessage);
-        do {
-            printf("Выберите действие: ");
-        } while (scanf("%c", &userChoice) != 1);
-        flushSTDIN();
+        printf("Выберите действие: \n");
+        scanf("%c", &userChoice);
+
         switch (userChoice) {
             case '0':
                 return 0;
@@ -128,7 +128,10 @@ int menu() {
             case '4':
                 clearScreen();
                 removeEntry();
+                break;
             default:
+                clearScreen();
+
                 continue;
         }
     }
