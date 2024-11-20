@@ -147,7 +147,7 @@ bool dictionaryHas(TreeNode* root, int key) {
 char* dictionaryGet(TreeNode* root, int key) {
     TreeNode* iter = dictionaryFindEntry(root, key);
     if (iter == NULL) {
-        return false;
+        return NULL;
     }
     return iter->string;
 }
