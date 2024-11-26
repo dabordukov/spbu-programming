@@ -158,7 +158,7 @@ void treeFree(TreeNode* root) {
     }
     treeFree(root->left);
     treeFree(root->right);
-    free(root);
+    treeNodeFree(root);
 }
 
 void dictionaryFree(TreeNode** root) {
