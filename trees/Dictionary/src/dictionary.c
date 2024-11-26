@@ -29,10 +29,9 @@ TreeNode* dictionaryCreate(int key, char* string) {
     return treeNodeCreate(key, string);
 }
 
-static void treeNodeFree(TreeNode** node) {
-    free((*node)->string);
-    free(*node);
-    *node = NULL;
+static void treeNodeFree(TreeNode* node) {
+    free(node->string);
+    free(node);
 }
 
 bool inDictionary(TreeNode* root, int key) {
@@ -112,7 +111,7 @@ TreeNode* dictionaryEntryRemoveInternals(TreeNode* root, int key) {
             new = root->left;
         }
 
-        treeNodeFree(&old);
+        treeNodeFree(old);
         return new;
     }
 
