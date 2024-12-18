@@ -1,5 +1,6 @@
 #include <locale.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "binary.h"
 #include "ioAuxiliaries.h"
@@ -23,4 +24,6 @@ int main() {
     } else {
         printf("Ошибка\n");
     }
+
+    free(binaryNumber);
 }
