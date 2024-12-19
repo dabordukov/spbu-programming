@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
     int arraySize = 0;
 
     if (argc > 1) {
-        arraySize = parseArrayFromFile(argv[1], &array);
+        array = parseArrayFromFileAllocate(argv[1], &arraySize);
     } else {
         arraySize = 50;
         array = checkedMalloc(sizeof(int) * arraySize);

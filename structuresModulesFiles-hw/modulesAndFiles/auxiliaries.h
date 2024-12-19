@@ -8,5 +8,5 @@ void printArray(int* array, int size);
 void fillArrayRand(int* array, int size, int rangeMax);
 bool addIntOverflow(int a, int b);
 void* checkedMalloc(size_t size);
-int parseArrayFromFile(char* filename, int** array);
+int* parseArrayFromFileAllocate(char* filename, int* arraySze);
 #endif

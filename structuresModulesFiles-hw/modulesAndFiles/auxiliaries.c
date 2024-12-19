@@ -39,19 +39,19 @@ bool addIntOverflow(int a, int b) {
     return false;
 }
 
-int parseArrayFromFile(char* filename, int** array) {
+int* parseArrayFromFileAllocate(char* filename, int* arraySize) {
     FILE* file = fopen(filename, "r");
-    int arraySize = 0;
+    *arraySize = 0;
 
-    fscanf(file, "%d", &arraySize);
-    *array = checkedMalloc(sizeof(int) * arraySize);
+    fscanf(file, "%d", arraySize);
+    int* array = checkedMalloc(sizeof(int) * *arraySize);
 
     int k = 0;
-    for (int i = 0; i < arraySize; i++) {
-        if (fscanf(file, "%d", (*array + i)) == 1) {
+    for (int i = 0; i < *arraySize; i++) {
+        if (fscanf(file, "%d", array + i) == 1) {
             k++;
         }
     }
     fclose(file);
-    return k;
+    return array;
 }
