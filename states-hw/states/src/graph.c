@@ -85,13 +85,22 @@ int* conquerCitiesAllocate(Graph graph) {
 
     int freeCities = graph.size - graph.capitalsSize;
     for (int state = 0; state < graph.capitalsSize && freeCities > 0; state = (state + 1) % graph.capitalsSize) {
+        int* currState = (states + state * (graph.size + 1));
         int minLength = INT_MAX;
         int nearestCity = -1;
-        for (int city = 0; (states + state * (graph.size + 1))[city] != -1; city++) {
-            int cityID = (states + state * (graph.size + 1))[city];
+
+        // iterate over the state's cities
+        for (int city = 0; currState[city] != -1; city++) {
+            int* currCity = (graph.matrix + currState[city] * graph.size);
+
+            // check cities neighbour to the current state's city
             for (int neighbour = 0; neighbour < graph.size; neighbour++) {
-                int length = (graph.matrix + cityID * graph.size)[neighbour];
-                if (length == -1 || conquered[neighbour]) {
+                if (conquered[neighbour]) {
+                    continue;
+                }
+
+                int length = currCity[neighbour];
+                if (length == -1) {
                     continue;
                 }
 
@@ -107,8 +116,8 @@ int* conquerCitiesAllocate(Graph graph) {
 
         conquered[nearestCity] = true;
 
-        int currStateSize = (states + state * (graph.size + 1))[graph.size]++;
-        (states + state * (graph.size + 1))[currStateSize] = nearestCity;
+        int currStateSize = currState[graph.size]++;
+        currState[currStateSize] = nearestCity;
         freeCities--;
     }
 
