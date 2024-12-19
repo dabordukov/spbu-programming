@@ -17,8 +17,7 @@ int main(int argc, char* argv[]) {
 
     Graph g = graphFromFile(filename);
     int* states;
-    for (int i = 0; i < 4999999; i++)
-        states = conquerCitiesAllocate(g);
+    states = conquerCitiesAllocate(g);
 
     for (int state = 0; state < g.capitalsSize; state++) {
         printf("[State%d]: ", g.capitals[state]);
