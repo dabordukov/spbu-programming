@@ -5,10 +5,10 @@
 
 int main(int argc, char* argv[]) {
     char* filename = NULL;
+    int readBytes = 0;
     if (argc > 1) {
         filename = argv[1];
     } else {
-        int readBytes = 0;
         while (readBytes == 0) {
             printf("Введите имя файла с графом:\n");
             readBytes = readLine(&filename);
@@ -29,6 +29,9 @@ int main(int argc, char* argv[]) {
         printf("\n");
     }
 
+    if (readBytes > 0) {
+        free(filename);
+    }
     free(g.capitals);
     free(g.matrix);
     free(states);
