@@ -8,7 +8,7 @@ typedef struct Stack Stack;
    else return popped value */
 int stackPop(Stack* stack, int* error);
 
-int stackPush(Stack* stack, int value);
+void stackPush(Stack* stack, int value);
 bool stackIsEmpty(Stack* stack);
 
 /* sets ERROR to 1 on empty stack

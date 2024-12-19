@@ -29,14 +29,12 @@ Stack* stackInit() {
     return stack;
 }
 
-int stackPush(Stack* stack, int value) {
+void stackPush(Stack* stack, int value) {
     struct stackElement* element = checkedCalloc(1, sizeof(struct stackElement));
     element->next = stack->top;
     element->value = value;
     stack->top = element;
     stack->size++;
-
-    return 0;
 }
 
 int stackPop(Stack* stack, int* error) {
