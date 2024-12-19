@@ -9,42 +9,50 @@ Graph graphRead(FILE* stream) {
     Graph graph = {.size = 0, .matrix = NULL, .capitalsSize = 0, .capitals = NULL};
     int cities = 0;
     int roads = 0;
-    fscanf(stream, "%d %d", &cities, &roads);
+    if (fscanf(stream, "%d %d", &cities, &roads) != 2) {
+        return graph;
+    }
 
-    graph.matrix = calloc(cities * cities, sizeof(int));
-    if (graph.matrix == NULL) {
+    int* matrix = calloc(cities * cities, sizeof(int));
+    if (matrix == NULL) {
         return graph;
     }
     for (int i = 0; i < cities; i++) {
         for (int j = 0; j < cities; j++) {
-            (graph.matrix + i * cities)[j] = -1;
+            (matrix + i * cities)[j] = -1;
         }
     }
-
-    graph.size = cities;
 
     for (int i = 0; i < roads; i++) {
         int city1 = -1;
         int city2 = -1;
         int length = -1;
-        fscanf(stream, "%d %d %d", &city1, &city2, &length);
-        (graph.matrix + city1 * cities)[city2] = length;
-        (graph.matrix + city2 * cities)[city1] = length;
+        if (fscanf(stream, "%d %d %d", &city1, &city2, &length) != 3) {
+            return graph;
+        }
+
+        (matrix + city1 * cities)[city2] = length;
+        (matrix + city2 * cities)[city1] = length;
     }
 
-    fscanf(stream, "%d", &graph.capitalsSize);
+    if (fscanf(stream, "%d", &graph.capitalsSize) != 1) {
+        return graph;
+    }
 
-    graph.capitals = calloc(graph.capitalsSize, sizeof(int));
-    if (graph.capitals == NULL) {
-        free(graph.matrix);
-        graph.size = 0;
+    int* capitals = calloc(graph.capitalsSize, sizeof(int));
+    if (capitals == NULL) {
         return graph;
     }
 
     for (int i = 0; i < graph.capitalsSize; i++) {
-        fscanf(stream, "%d", graph.capitals + i);
+        if (fscanf(stream, "%d", capitals + i) != 1) {
+            return graph;
+        }
     }
 
+    graph.matrix = matrix;
+    graph.capitals = capitals;
+    graph.size = cities;
     return graph;
 }
 
