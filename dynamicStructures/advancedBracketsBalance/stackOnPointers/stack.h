@@ -2,7 +2,7 @@
 #define STACK_ON_POINTERS
 #include <stdbool.h>
 
-typedef struct Stack* Stack;
+typedef struct Stack Stack;
 
 /* sets ERROR to 1 on empty stack
    else return popped value */
