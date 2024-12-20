@@ -62,6 +62,6 @@ int processFile(char* inputFilename, char* outputFilename, int a, int b) {
     }
 
     fclose(outFile);
-
+    listFree(&list);
     return 0;
 }
