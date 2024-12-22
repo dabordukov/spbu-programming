@@ -1,14 +1,14 @@
 #ifndef LIST_H
 #define LIST_H
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 
 typedef struct List List;
 
-#ifndef INTERNALS_CIRCULAR_LIST_H
-typedef void ListPosition;
-#endif
+typedef struct ListNode ListPosition;
+
 /*pointer to the list node*/
 typedef ListPosition* pListPos;
 
@@ -25,8 +25,10 @@ void listFree(List** list);
 /* Returns the number of elements in the list*/
 size_t listSize(List* list);
 
+/* Return true if the list is empty, otherwise return false*/
 bool listIsEmpty(List* list);
 
+/* Return data from node*/
 void* listPosGetData(ListPosition* pos);
 
 /* Return position of the first node
@@ -56,14 +58,24 @@ ListPosition* listFindData(List* list, void* data, bool (*compareData)(void*, vo
 size_t listPosMove(ListPosition** pos, size_t steps);
 
 /* Insert node with DATA after the POS node
-   If pos==NULL, insert node in the beginning of the list*/
+   If pos==NULL, insert node in the beginning of the list
+   Returns pointer to node
+   Returns NULL on error */
 ListPosition* listInsertAfter(List* list, void* data, ListPosition* pos);
-/* Insert node with DATA in the end of the lists*/
+
+/* Insert node with DATA in the end of the lists
+   Returns pointer to node
+   Returns NULL on error */
 ListPosition* listAppend(List* list, void* data);
 
-/* Insert node with DATA and custom dataDestructor after the POS node*/
+/* Insert node with DATA and custom dataDestructor after the POS node
+   Returns pointer to node
+   Returns NULL on error */
 ListPosition* listInsertAfterWithDestructor(List* list, void* data, ListPosition* pos, void (*dataDestructor)(void*));
-/* Insert node with DATA and custom dataDestructor in the end of the lists*/
+
+/* Insert node with DATA and custom dataDestructor in the end of the lists
+   Returns pointer to node
+   Returns NULL on error */
 ListPosition* listAppendWithDestructor(List* list, void* data, void (*dataDestructor)(void*));
 
 /* Delete node from list*/
@@ -71,6 +83,7 @@ void listRemoveNode(List* list, ListPosition** pos);
 
 /* Applies printData(void*) to data in every node*/
 void listPrint(List* list, void (*printData)(void*));
+
 /* Applies printData(FILE*, void*) to data in every node*/
 void listPrintStream(List* list, void (*printData)(FILE*, void*), FILE* stream);
 
