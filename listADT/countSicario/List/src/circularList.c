@@ -24,7 +24,7 @@ typedef List CircularList;
 
 static ListNode* createNode(void* data, void (*dataDestructor)(void*)) {
     ListNode* newNode = calloc(1, sizeof(ListNode));
-    if (!newNode) {
+    if (newNode == NULL) {
         return NULL;
     }
     newNode->data = data;
@@ -55,6 +55,10 @@ void* circularListPosGetData(CircularListPosition* pos) {
 
 CircularListPosition* circularListInsertAfterWithDestructor(CircularList* list, void* data, CircularListPosition* pos, void (*dataDestructor)(void*)) {
     ListNode* newNode = createNode(data, dataDestructor);
+    if (newNode == NULL) {
+        return NULL;
+    }
+
     if (listIsEmpty(list)) {
         list->first = newNode;
         list->last = newNode;
@@ -85,6 +89,9 @@ CircularListPosition* circularListInsertAfter(CircularList* list, void* data, Ci
 
 CircularListPosition* circularListAppendWithDestructor(CircularList* list, void* data, void (*dataDestructor)(void*)) {
     ListNode* newNode = createNode(data, dataDestructor);
+    if (newNode == NULL) {
+        return NULL;
+    }
 
     if (listIsEmpty(list)) {
         list->first = newNode;

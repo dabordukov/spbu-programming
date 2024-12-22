@@ -57,16 +57,24 @@ CircularListPosition* circularListFindData(CircularList* list, void* data, bool 
 size_t circularListPosMove(CircularListPosition** pos, size_t steps);
 
 /* Insert node with DATA after the POS node
-   If pos==NULL, insert node in the beginning of the circular list*/
+   If pos==NULL, insert node in the beginning of the circular list
+   Returns pointer to node
+   Returns NULL on error */
 CircularListPosition* circularListInsertAfter(CircularList* list, void* data, CircularListPosition* pos);
 
-/* Insert node with DATA in the end of the circular lists*/
+/* Insert node with DATA in the end of the circular lists
+   Returns pointer to node
+   Returns NULL on error */
 CircularListPosition* circularListAppend(CircularList* list, void* data);
 
-/* Insert node with DATA and custom dataDestructor after the POS node*/
+/* Insert node with DATA and custom dataDestructor after the POS node
+   Returns pointer to node
+   Returns NULL on error */
 CircularListPosition* circularListInsertAfterWithDestructor(CircularList* list, void* data, CircularListPosition* pos, void (*dataDestructor)(void*));
 
-/* Insert node with DATA and custom dataDestructor in the end of the circular list*/
+/* Insert node with DATA and custom dataDestructor in the end of the circular list
+   Returns pointer to node
+   Returns NULL on error */
 CircularListPosition* circularListAppendWithDestructor(CircularList* list, void* data, void (*dataDestructor)(void*));
 
 /* Delete node from circular list*/
