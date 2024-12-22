@@ -50,7 +50,7 @@ void testSortByNumber() {
     assert(compareFiles("test.tmp", CHECKFILE2));
 }
 
-int main() {
+int main(void) {
     setlocale(LC_CTYPE, "");
 
     testSortByName();
