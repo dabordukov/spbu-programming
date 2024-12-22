@@ -84,10 +84,11 @@ int* conquerCitiesAllocate(Graph graph) {
 
     bool* conquered = calloc(graph.size, sizeof(bool));
 
+    // initialize states with capitals
     for (int capital = 0; capital < graph.capitalsSize; capital++) {
         conquered[graph.capitals[capital]] = true;
 
-        (states + capital * (graph.size + 1))[graph.size]++;
+        (states + capital * (graph.size + 1))[graph.size] = 1;
         (states + capital * (graph.size + 1))[0] = graph.capitals[capital];
     }
 
