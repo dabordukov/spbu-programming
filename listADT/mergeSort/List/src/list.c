@@ -1,6 +1,6 @@
+#include "list.h"
 
 #include <assert.h>
-#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +10,7 @@ typedef struct ListNode {
     struct ListNode* next;
     void (*dataDestructor)(void*);
 } ListNode;
+
 typedef ListNode ListPosition;
 
 typedef struct List {
