@@ -34,6 +34,10 @@ static ListNode* createNode(void* data, void (*dataDestructor)(void*)) {
 /* dataDestructor is set to default for deleting data from list nodes */
 List* listInitWithDestructor(void (*dataDestructor)(void*)) {
     List* list = calloc(1, sizeof(List));
+    if (list == NULL) {
+        return NULL;
+    }
+
     list->defaultDestructor = dataDestructor;
     return list;
 }
@@ -64,6 +68,10 @@ void* listPosGetData(ListPosition* pos) {
 
 ListPosition* listInsertAfterWithDestructor(List* list, void* data, ListPosition* pos, void (*dataDestructor)(void*)) {
     ListNode* newNode = createNode(data, dataDestructor);
+    if (newNode == NULL) {
+        return NULL;
+    }
+
     if (listIsEmpty(list)) {
         list->first = newNode;
         list->last = newNode;
@@ -93,6 +101,9 @@ ListPosition* listInsertAfter(List* list, void* data, ListPosition* pos) {
 
 ListPosition* listAppendWithDestructor(List* list, void* data, void (*dataDestructor)(void*)) {
     ListNode* newNode = createNode(data, dataDestructor);
+    if (newNode == NULL) {
+        return NULL;
+    }
 
     if (listIsEmpty(list)) {
         list->first = newNode;
