@@ -1,16 +1,17 @@
-#define INTERNALS_CIRCULAR_LIST_H
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "list.h"
 
 typedef struct ListNode {
     void* data;
     struct ListNode* next;
     void (*dataDestructor)(void*);
 } ListNode;
+
 typedef ListNode ListPosition;
-typedef ListPosition CircListPosition;
-#include "list.h"
+typedef ListNode CircularListPosition;
 
 typedef struct List {
     size_t size;
@@ -18,7 +19,8 @@ typedef struct List {
     ListNode* last;
     void (*defaultDestructor)(void*);
 } List;
-typedef List CircList;
+
+typedef List CircularList;
 
 static ListNode* createNode(void* data, void (*dataDestructor)(void*)) {
     ListNode* newNode = calloc(1, sizeof(ListNode));
@@ -31,27 +33,27 @@ static ListNode* createNode(void* data, void (*dataDestructor)(void*)) {
     return newNode;
 }
 
-CircList* circListInitWithDestructor(void (*dataDestructor)(void*)) {
+CircularList* circularListInitWithDestructor(void (*dataDestructor)(void*)) {
     return listInitWithDestructor(dataDestructor);
 }
 
-CircList* circListInit() {
+CircularList* circularListInit() {
     return listInitWithDestructor(&free);
 }
 
-size_t circListSize(CircList* list) {
+size_t circularListSize(CircularList* list) {
     return list->size;
 }
 
-bool circListIsEmpty(CircList* list) {
+bool circularListIsEmpty(CircularList* list) {
     return listIsEmpty(list);
 }
 
-void* circListPosGetData(CircListPosition* pos) {
+void* circularListPosGetData(CircularListPosition* pos) {
     return listPosGetData(pos);
 }
 
-CircListPosition* circListInsertAfterWithDestructor(CircList* list, void* data, CircListPosition* pos, void (*dataDestructor)(void*)) {
+CircularListPosition* circularListInsertAfterWithDestructor(CircularList* list, void* data, CircularListPosition* pos, void (*dataDestructor)(void*)) {
     ListNode* newNode = createNode(data, dataDestructor);
     if (listIsEmpty(list)) {
         list->first = newNode;
@@ -77,11 +79,11 @@ CircListPosition* circListInsertAfterWithDestructor(CircList* list, void* data, 
     return newNode;
 }
 
-CircListPosition* circListInsertAfter(CircList* list, void* data, CircListPosition* pos) {
-    return circListInsertAfterWithDestructor(list, data, pos, list->defaultDestructor);
+CircularListPosition* circularListInsertAfter(CircularList* list, void* data, CircularListPosition* pos) {
+    return circularListInsertAfterWithDestructor(list, data, pos, list->defaultDestructor);
 }
 
-CircListPosition* circListAppendWithDestructor(CircList* list, void* data, void (*dataDestructor)(void*)) {
+CircularListPosition* circularListAppendWithDestructor(CircularList* list, void* data, void (*dataDestructor)(void*)) {
     ListNode* newNode = createNode(data, dataDestructor);
 
     if (listIsEmpty(list)) {
@@ -96,11 +98,11 @@ CircListPosition* circListAppendWithDestructor(CircList* list, void* data, void 
     return newNode;
 }
 
-CircListPosition* circListAppend(CircList* list, void* data) {
-    return circListAppendWithDestructor(list, data, list->defaultDestructor);
+CircularListPosition* circularListAppend(CircularList* list, void* data) {
+    return circularListAppendWithDestructor(list, data, list->defaultDestructor);
 }
 
-CircListPosition* circListFindData(CircList* list, void* data, bool (*compareData)(void*, void*)) {
+CircularListPosition* circularListFindData(CircularList* list, void* data, bool (*compareData)(void*, void*)) {
     if (listIsEmpty(list)) {
         return NULL;
     }
@@ -108,7 +110,7 @@ CircListPosition* circListFindData(CircList* list, void* data, bool (*compareDat
     ListNode* iter = list->first;
     for (size_t i = 0; i < list->size; i++) {
         if (compareData(iter->data, data)) {
-            return (CircListPosition*)iter;
+            return (CircularListPosition*)iter;
         }
         iter = iter->next;
     }
@@ -116,19 +118,19 @@ CircListPosition* circListFindData(CircList* list, void* data, bool (*compareDat
     return NULL;
 }
 
-CircListPosition* circListNextNode(CircListPosition* pos) {
+CircularListPosition* circularListNextNode(CircularListPosition* pos) {
     return listNextNode(pos);
 }
 
-CircListPosition* circListPrevNode(CircList* list, CircListPosition* pos) {
-    if (circListIsEmpty(list) || pos == NULL) {
+CircularListPosition* circularListPrevNode(CircularList* list, CircularListPosition* pos) {
+    if (circularListIsEmpty(list) || pos == NULL) {
         return NULL;
     }
     if (pos == list->first) {
         return list->last;
     }
 
-    CircListPosition* prev = list->first;
+    CircularListPosition* prev = list->first;
     for (size_t i = 0; i < list->size; i++) {
         if (prev->next == pos) {
             return prev;
@@ -139,12 +141,12 @@ CircListPosition* circListPrevNode(CircList* list, CircListPosition* pos) {
     return NULL;
 }
 
-void circListRemoveNode(CircList* list, CircListPosition** pos) {
+void circularListRemoveNode(CircularList* list, CircularListPosition** pos) {
     if (*pos == NULL) {
         return;
     }
 
-    CircListPosition* prev = circListPrevNode(list, *pos);
+    CircularListPosition* prev = circularListPrevNode(list, *pos);
     if (prev == NULL) {
         return;
     }
@@ -168,19 +170,19 @@ void circListRemoveNode(CircList* list, CircListPosition** pos) {
     *pos = NULL;
 }
 
-void circListPrint(CircList* list, void (*printData)(void*)) {
-    if (circListIsEmpty(list)) {
+void circularListPrint(CircularList* list, void (*printData)(void*)) {
+    if (circularListIsEmpty(list)) {
         return;
     }
 
-    CircListPosition* iter = list->first;
+    CircularListPosition* iter = list->first;
     for (size_t i = 0; i < list->size; i++) {
         printData(iter->data);
         iter = iter->next;
     }
 }
 
-size_t circListPosMove(CircListPosition** pos, size_t steps) {
+size_t circularListPosMove(CircularListPosition** pos, size_t steps) {
     if (*pos == NULL) {
         return 0;
     }
@@ -192,18 +194,18 @@ size_t circListPosMove(CircListPosition** pos, size_t steps) {
     return steps;
 }
 
-CircListPosition* circListFirst(CircList* list) {
+CircularListPosition* circularListFirst(CircularList* list) {
     return list->first;
 }
 
-CircListPosition* circListLast(CircList* list) {
+CircularListPosition* circularListLast(CircularList* list) {
     return list->last;
 }
 
-void circListFree(CircList** list) {
-    while (!circListIsEmpty(*list)) {
+void circularListFree(CircularList** list) {
+    while (!circularListIsEmpty(*list)) {
         ListPosition* last = (*list)->last;
-        circListRemoveNode(*list, &last);
+        circularListRemoveNode(*list, &last);
     }
 
     free(*list);

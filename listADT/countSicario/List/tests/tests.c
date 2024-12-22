@@ -249,169 +249,169 @@ void testListRemoveNode() {
 }
 
 void testCircListInitFree() {
-    CircList* list = circListInitWithDestructor(&nothing);
+    CircularList* list = circularListInitWithDestructor(&nothing);
     assert(list);
-    circListAppend(list, "1234");
-    circListFree(&list);
+    circularListAppend(list, "1234");
+    circularListFree(&list);
     assert(list == NULL);
 }
 
 void testCircListAppendInsert() {
-    CircList* list = circListInitWithDestructor(&nothing);
+    CircularList* list = circularListInitWithDestructor(&nothing);
 
-    pCircListPos first = circListAppend(list, "1234");
-    pCircListPos second = circListAppend(list, "5678");
-    ASSERT_STR(circListPosGetData(first), "1234");
-    ASSERT_STR(circListPosGetData(second), "5678");
+    pCircularListPos first = circularListAppend(list, "1234");
+    pCircularListPos second = circularListAppend(list, "5678");
+    ASSERT_STR(circularListPosGetData(first), "1234");
+    ASSERT_STR(circularListPosGetData(second), "5678");
 
-    ASSERT_STR(circListPosGetData(circListNextNode(first)), "5678");
-    ASSERT_STR(circListPosGetData(circListPrevNode(list, second)), "1234");
-    ASSERT_STR(circListPosGetData(circListNextNode(second)), "1234");
+    ASSERT_STR(circularListPosGetData(circularListNextNode(first)), "5678");
+    ASSERT_STR(circularListPosGetData(circularListPrevNode(list, second)), "1234");
+    ASSERT_STR(circularListPosGetData(circularListNextNode(second)), "1234");
 
-    circListInsertAfter(list, "44", first);
-    ASSERT_STR(circListPosGetData(circListNextNode(first)), "44");
+    circularListInsertAfter(list, "44", first);
+    ASSERT_STR(circularListPosGetData(circularListNextNode(first)), "44");
 
-    circListFree(&list);
+    circularListFree(&list);
 
-    list = circListInit();
-    circListInsertAfterWithDestructor(list, "1", NULL, &nothing);
-    ASSERT_STR(circListPosGetData(circListFirst(list)), "1");
+    list = circularListInit();
+    circularListInsertAfterWithDestructor(list, "1", NULL, &nothing);
+    ASSERT_STR(circularListPosGetData(circularListFirst(list)), "1");
 
-    circListInsertAfterWithDestructor(list, "1337", circListLast(list), &nothing);
-    ASSERT_STR(circListPosGetData(circListLast(list)), "1337");
-    circListFree(&list);
+    circularListInsertAfterWithDestructor(list, "1337", circularListLast(list), &nothing);
+    ASSERT_STR(circularListPosGetData(circularListLast(list)), "1337");
+    circularListFree(&list);
 }
 
 void testCircListFind() {
-    CircList* list = circListInitWithDestructor(&nothing);
-    assert(circListFindData(list, "1", &equalStr) == NULL);
+    CircularList* list = circularListInitWithDestructor(&nothing);
+    assert(circularListFindData(list, "1", &equalStr) == NULL);
 
     char str[10][2];
     for (int i = 0; i < 10; i++) {
         sprintf(str[i], "%d", i);
-        circListAppend(list, str[i]);
+        circularListAppend(list, str[i]);
     }
 
-    ASSERT_STR(circListPosGetData(circListFindData(list, "0", &equalStr)), "0");
-    ASSERT_STR(circListPosGetData(circListFindData(list, "9", &equalStr)), "9");
-    ASSERT_STR(circListPosGetData(circListFindData(list, "4", &equalStr)), "4");
-    assert(circListFindData(list, "11", &equalStr) == NULL);
+    ASSERT_STR(circularListPosGetData(circularListFindData(list, "0", &equalStr)), "0");
+    ASSERT_STR(circularListPosGetData(circularListFindData(list, "9", &equalStr)), "9");
+    ASSERT_STR(circularListPosGetData(circularListFindData(list, "4", &equalStr)), "4");
+    assert(circularListFindData(list, "11", &equalStr) == NULL);
 
-    circListFree(&list);
+    circularListFree(&list);
 }
 
 void testCircListMisc() {
-    CircList* list = circListInitWithDestructor(&nothing);
+    CircularList* list = circularListInitWithDestructor(&nothing);
 
     char str[10][2];
     for (int i = 0; i < 10; i++) {
         sprintf(str[i], "%d", i);
-        circListAppend(list, str[i]);
+        circularListAppend(list, str[i]);
     }
 
     // circLisPosMove test
     {
-        CircListPosition* node = circListFindData(list, "0", &equalStr);
-        CircListPosition* step1 = circListFindData(list, "1", &equalStr);
-        CircListPosition* step2more = circListFindData(list, "3", &equalStr);
-        CircListPosition* node8 = circListFindData(list, "8", &equalStr);
+        CircularListPosition* node = circularListFindData(list, "0", &equalStr);
+        CircularListPosition* step1 = circularListFindData(list, "1", &equalStr);
+        CircularListPosition* step2more = circularListFindData(list, "3", &equalStr);
+        CircularListPosition* node8 = circularListFindData(list, "8", &equalStr);
 
-        assert(circListPosMove(&node, 1) == 1);
+        assert(circularListPosMove(&node, 1) == 1);
         assert(step1 == node);
-        assert(circListPosMove(&node, 2) == 2);
+        assert(circularListPosMove(&node, 2) == 2);
         assert(step2more == node);
-        assert(circListPosMove(&node, 15) == 15);
+        assert(circularListPosMove(&node, 15) == 15);
         assert(node8 == node);
 
         node = NULL;
-        assert(circListPosMove(&node, 1) == 0);
+        assert(circularListPosMove(&node, 1) == 0);
         assert(node == NULL);
     }
 
     // circListNextNode circListPrevNode tests
     {
-        assert(circListNextNode(NULL) == NULL);
-        assert(circListPrevNode(list, NULL) == NULL);
+        assert(circularListNextNode(NULL) == NULL);
+        assert(circularListPrevNode(list, NULL) == NULL);
 
-        assert(circListNextNode(circListLast(list)) == circListFirst(list));
-        assert(circListPrevNode(list, circListFirst(list)) == circListLast(list));
+        assert(circularListNextNode(circularListLast(list)) == circularListFirst(list));
+        assert(circularListPrevNode(list, circularListFirst(list)) == circularListLast(list));
 
-        assert(circListNextNode(circListFindData(list, "0", &equalStr)) == circListFindData(list, "1", &equalStr));
-        assert(circListPrevNode(list, circListFindData(list, "6", &equalStr)) == circListFindData(list, "5", &equalStr));
+        assert(circularListNextNode(circularListFindData(list, "0", &equalStr)) == circularListFindData(list, "1", &equalStr));
+        assert(circularListPrevNode(list, circularListFindData(list, "6", &equalStr)) == circularListFindData(list, "5", &equalStr));
     }
 
     // circListGetPosData tests
     {
-        assert(circListPosGetData(NULL) == NULL);
-        assert(circListPosGetData(circListFirst(list)) == str[0]);
-        assert(circListPosGetData(circListLast(list)) == str[9]);
-        assert(circListPosGetData(circListPrevNode(list, circListLast(list))) == str[8]);
+        assert(circularListPosGetData(NULL) == NULL);
+        assert(circularListPosGetData(circularListFirst(list)) == str[0]);
+        assert(circularListPosGetData(circularListLast(list)) == str[9]);
+        assert(circularListPosGetData(circularListPrevNode(list, circularListLast(list))) == str[8]);
     }
 
-    circListFree(&list);
+    circularListFree(&list);
 }
 
 void testCircListRemoveNode() {
-    CircList* list = circListInitWithDestructor(&nothing);
+    CircularList* list = circularListInitWithDestructor(&nothing);
 
     char str[10][2];
     for (int i = 0; i < 10; i++) {
         sprintf(str[i], "%d", i);
-        circListAppend(list, str[i]);
+        circularListAppend(list, str[i]);
     }
 
     {
-        CircListPosition* nullNode = NULL;
-        size_t circListSizeTmp = circListSize(list);
-        circListRemoveNode(list, &nullNode);
-        assert(circListSize(list) == circListSizeTmp);
+        CircularListPosition* nullNode = NULL;
+        size_t circListSizeTmp = circularListSize(list);
+        circularListRemoveNode(list, &nullNode);
+        assert(circularListSize(list) == circListSizeTmp);
     }
 
     // mid element
     {
-        pCircListPos find = circListFindData(list, "5", &equalStr);
-        pCircListPos prev = circListPrevNode(list, find);
-        pCircListPos next = circListNextNode(find);
-        circListRemoveNode(list, &find);
+        pCircularListPos find = circularListFindData(list, "5", &equalStr);
+        pCircularListPos prev = circularListPrevNode(list, find);
+        pCircularListPos next = circularListNextNode(find);
+        circularListRemoveNode(list, &find);
         assert(find == NULL);
-        assert(circListFindData(list, "5", &equalStr) == NULL);
+        assert(circularListFindData(list, "5", &equalStr) == NULL);
 
         // checks that .next pointer was set correctly
-        assert(circListPrevNode(list, next) == prev);
-        assert(circListNextNode(prev) == next);
+        assert(circularListPrevNode(list, next) == prev);
+        assert(circularListNextNode(prev) == next);
     }
 
     // first element
     {
-        pCircListPos find = circListFindData(list, "0", &equalStr);
-        pCircListPos prev = circListPrevNode(list, find);
-        pCircListPos next = circListNextNode(find);
-        circListRemoveNode(list, &find);
+        pCircularListPos find = circularListFindData(list, "0", &equalStr);
+        pCircularListPos prev = circularListPrevNode(list, find);
+        pCircularListPos next = circularListNextNode(find);
+        circularListRemoveNode(list, &find);
         assert(find == NULL);
-        assert(circListFindData(list, "0", &equalStr) == NULL);
+        assert(circularListFindData(list, "0", &equalStr) == NULL);
 
         // checks that .last->next & .first pointers was set correctly
-        assert(circListNextNode(circListLast(list)) == next);
-        assert(circListFirst(list) == next);
-        assert(circListPrevNode(list, next) == prev);
+        assert(circularListNextNode(circularListLast(list)) == next);
+        assert(circularListFirst(list) == next);
+        assert(circularListPrevNode(list, next) == prev);
     }
 
     // last element
     {
-        pCircListPos find = circListFindData(list, "9", &equalStr);
-        pCircListPos prev = circListPrevNode(list, find);
-        pCircListPos next = circListNextNode(find);
-        circListRemoveNode(list, &find);
+        pCircularListPos find = circularListFindData(list, "9", &equalStr);
+        pCircularListPos prev = circularListPrevNode(list, find);
+        pCircularListPos next = circularListNextNode(find);
+        circularListRemoveNode(list, &find);
         assert(find == NULL);
-        assert(circListFindData(list, "9", &equalStr) == NULL);
+        assert(circularListFindData(list, "9", &equalStr) == NULL);
 
         // checks that .next and .last pointers were set correctly
-        assert(next == circListFirst(list));
-        assert(circListNextNode(prev) == next);
-        assert(circListLast(list) == prev);
+        assert(next == circularListFirst(list));
+        assert(circularListNextNode(prev) == next);
+        assert(circularListLast(list) == prev);
     }
 
-    circListFree(&list);
+    circularListFree(&list);
 }
 
 int main() {

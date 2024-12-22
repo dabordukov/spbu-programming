@@ -7,20 +7,20 @@ void nothing(void* _) {
 }
 
 intptr_t sicarioKilling(int n, int m) {
-    CircList* list = circListInitWithDestructor(&nothing);
+    CircularList* list = circularListInitWithDestructor(&nothing);
     for (intptr_t i = 1; i < n + 1; i++) {
-        circListAppend(list, (void*)i);
+        circularListAppend(list, (void*)i);
     }
 
-    CircListPosition* iter = circListFirst(list);
-    while (circListSize(list) != 1) {
-        circListPosMove(&iter, m - 1);
-        CircListPosition* victim = iter;
-        circListPosMove(&iter, 1);
-        circListRemoveNode(list, &victim);
+    CircularListPosition* iter = circularListFirst(list);
+    while (circularListSize(list) != 1) {
+        circularListPosMove(&iter, m - 1);
+        CircularListPosition* victim = iter;
+        circularListPosMove(&iter, 1);
+        circularListRemoveNode(list, &victim);
     }
 
-    intptr_t lastOneStanding = (intptr_t)circListPosGetData(iter);
-    circListFree(&list);
+    intptr_t lastOneStanding = (intptr_t)circularListPosGetData(iter);
+    circularListFree(&list);
     return lastOneStanding;
 }
