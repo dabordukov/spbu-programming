@@ -1,1 +1,0 @@
-int calculate(char* expression, int* error);
