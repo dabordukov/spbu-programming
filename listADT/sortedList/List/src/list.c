@@ -1,6 +1,6 @@
+#include "list.h"
 
 #include <assert.h>
-#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +10,7 @@ typedef struct ListNode {
     struct ListNode* next;
     void (*dataDestructor)(void*);
 } ListNode;
+
 typedef ListNode ListPosition;
 
 typedef struct List {
@@ -33,6 +34,10 @@ static ListNode* createNode(void* data, void (*dataDestructor)(void*)) {
 /* dataDestructor is set to default for deleting data from list nodes */
 List* listInitWithDestructor(void (*dataDestructor)(void*)) {
     List* list = calloc(1, sizeof(List));
+    if (list == NULL) {
+        return NULL;
+    }
+
     list->defaultDestructor = dataDestructor;
     return list;
 }
@@ -63,6 +68,10 @@ void* listPosGetData(ListPosition* pos) {
 
 ListPosition* listInsertAfterWithDestructor(List* list, void* data, ListPosition* pos, void (*dataDestructor)(void*)) {
     ListNode* newNode = createNode(data, dataDestructor);
+    if (newNode == NULL) {
+        return NULL;
+    }
+
     if (listIsEmpty(list)) {
         list->first = newNode;
         list->last = newNode;
@@ -85,12 +94,16 @@ ListPosition* listInsertAfterWithDestructor(List* list, void* data, ListPosition
     return newNode;
 }
 
+/* Insert node with DATA after the POS node*/
 ListPosition* listInsertAfter(List* list, void* data, ListPosition* pos) {
     return listInsertAfterWithDestructor(list, data, pos, list->defaultDestructor);
 }
 
 ListPosition* listAppendWithDestructor(List* list, void* data, void (*dataDestructor)(void*)) {
     ListNode* newNode = createNode(data, dataDestructor);
+    if (newNode == NULL) {
+        return NULL;
+    }
 
     if (listIsEmpty(list)) {
         list->first = newNode;
