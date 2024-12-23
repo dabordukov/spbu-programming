@@ -1,174 +1,142 @@
+#include "dictionary.h"
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct TreeNode {
-    struct TreeNode* left;
-    struct TreeNode* right;
+typedef struct Dictionary {
+    struct Dictionary* left;
+    struct Dictionary* right;
     char* data;
     char* key;
     int balance;
-} TreeNode;
+} Dictionary;
 
-static size_t treeHeight(TreeNode* root) {
-    TreeNode* iter = root;
-    size_t height = 0;
+static size_t treeHeight(Dictionary* root) {
+    if (root == NULL)
+        return 0;
 
-    while (iter != NULL) {
-        height++;
-        if (root->balance < 0) {
-            iter = iter->left;
-        } else {
-            iter = iter->right;
-        }
-    }
-    return height;
+    int lHeight = treeHeight(root->left);
+    int rHeight = treeHeight(root->right);
+
+    return (lHeight > rHeight ? lHeight : rHeight) + 1;
 }
 
-static void updateBalance(TreeNode* root) {
+static void updateBalance(Dictionary* root) {
     if (root != NULL) {
         root->balance = treeHeight(root->right) - treeHeight(root->left);
     }
 }
 
-TreeNode* treeNodeCreate(char* key, char* data) {
-    TreeNode* node = calloc(1, sizeof(TreeNode));
+Dictionary* treeNodeCreate(char* key, char* data) {
+    Dictionary* node = calloc(1, sizeof(Dictionary));
     if (node != NULL) {
-        node->data = malloc((strlen(data) + 1) * sizeof(char));
+        node->data = strdup(data);
         if (node->data == NULL) {
             free(node);
             return NULL;
         }
-        strcpy(node->data, data);
 
-        node->key = malloc((strlen(data) + 1) * sizeof(char));
+        node->key = strdup(key);
         if (node->key == NULL) {
             free(node);
             return NULL;
         }
-        strcpy(node->key, key);
     }
 
     return node;
 }
 
-TreeNode* dictionaryCreate(char* key, char* data) {
+Dictionary* dictionaryCreate(char* key, char* data) {
     return treeNodeCreate(key, data);
 }
 
-static void treeNodeFree(TreeNode* node) {
+static void treeNodeFree(Dictionary* node) {
     free(node->data);
     free(node->key);
     free(node);
 }
 
-typedef struct {
-    TreeNode* node;
-    bool imbalanceIncreased;
-} NodeBalance;
-
-static TreeNode* rightRotate(TreeNode* root) {
-    TreeNode* newRoot = root->left;
+static Dictionary* rightRotate(Dictionary* root) {
+    Dictionary* newRoot = root->left;
     root->left = newRoot->right;
     newRoot->right = root;
+    updateBalance(newRoot);
     updateBalance(newRoot->left);
     updateBalance(newRoot->right);
-    updateBalance(newRoot);
-
     return newRoot;
 }
 
-static TreeNode* leftRotate(TreeNode* root) {
-    TreeNode* newRoot = root->right;
+static Dictionary* leftRotate(Dictionary* root) {
+    Dictionary* newRoot = root->right;
     root->right = newRoot->left;
     newRoot->left = root;
+    updateBalance(newRoot);
     updateBalance(newRoot->left);
     updateBalance(newRoot->right);
-    updateBalance(newRoot);
-
     return newRoot;
 }
 
-TreeNode* balanceTree(TreeNode* root) {
+Dictionary* balanceTree(Dictionary* root) {
     if (root == NULL) {
         return NULL;
     }
-    TreeNode* newRoot = root;
-    if (root->balance < -1) {
-        if (root->left->balance < 0) {
-            newRoot = rightRotate(root);
-        } else if (root->left->balance > 0) {
+
+    updateBalance(root);
+
+    if (root->balance < -1) {  // left heavy
+        if (root->left->balance > 0) {
             root->left = leftRotate(root->left);
-            newRoot = rightRotate(root);
         }
-    } else if (root->balance > 1) {
-        if (root->right->balance > 0) {
-            newRoot = leftRotate(root);
-        } else if (root->right->balance < 0) {
+        return rightRotate(root);
+    } else if (root->balance > 1) {  // right heavy
+        if (root->right->balance < 0) {
             root->right = rightRotate(root->right);
-            newRoot = leftRotate(root);
         }
+        return leftRotate(root);
     }
 
-    return newRoot;
+    return root;
 }
 
-static NodeBalance dictionaryInsertInternals(TreeNode* root, char* key, char* data, int* error) {
-    NodeBalance node = {.imbalanceIncreased = false, .node = NULL};
+Dictionary* dictionaryInsertInternals(Dictionary* root, char* key, char* data, int* error) {
     if (root == NULL) {
-        TreeNode* new = treeNodeCreate(key, data);
+        Dictionary* new = treeNodeCreate(key, data);
         if (new == NULL) {
             *error = 1;
         }
-        node.node = new;
-        node.imbalanceIncreased = true;
-        return node;
+        return new;
     }
-
-    if (strcmp(key, root->key) < 0) {
-        node = dictionaryInsertInternals(root->left, key, data, error);
-        if (node.imbalanceIncreased) {
-            if (root->balance > 0) {
-                node.imbalanceIncreased = false;
-            }
-            root->balance--;
-        }
-        root->left = node.node;
-    } else if (strcmp(key, root->key) > 0) {
-        node = dictionaryInsertInternals(root->right, key, data, error);
-        if (node.imbalanceIncreased) {
-            if (root->balance < 0) {
-                node.imbalanceIncreased = false;
-            }
-            root->balance++;
-        }
-        root->right = node.node;
-    } else {
+    if (strcmp(key, root->key) == 0) {
         free(root->data);
-        root->data = malloc((strlen(data) + 1) * sizeof(char));
-        strcpy(root->data, data);
-        return (NodeBalance){.imbalanceIncreased = false, .node = root};
+        root->data = strdup(data);
+        if (root->data == NULL) {
+            *error = 1;
+        }
+        return root;
+    }
+    if (strcmp(key, root->key) < 0) {
+        root->left = dictionaryInsertInternals(root->left, key, data, error);
+    } else {
+        root->right = dictionaryInsertInternals(root->right, key, data, error);
     }
 
-    root = balanceTree(root);
-
-    node.node = root;
-    return node;
+    return balanceTree(root);
 }
 
-int dictionaryInsert(TreeNode** root, char* key, char* data) {
+int dictionaryInsert(Dictionary** root, char* key, char* data) {
     int error = 0;
-    *root = dictionaryInsertInternals(*root, key, data, &error).node;
+    *root = dictionaryInsertInternals(*root, key, data, &error);
     return error;
 }
 
-static TreeNode* treePullLeftMost(TreeNode* root) {
+static Dictionary* treePullLeftMost(Dictionary* root) {
     if (root->left == NULL) {
         return root;
     }
 
-    TreeNode* node = treePullLeftMost(root->left);
+    Dictionary* node = treePullLeftMost(root->left);
     if (root->left == node) {
         root->left = node->right;
         node->right = NULL;
@@ -177,15 +145,24 @@ static TreeNode* treePullLeftMost(TreeNode* root) {
     return node;
 }
 
-NodeBalance dictionaryEntryRemoveInternals(TreeNode* root, char* key) {
-    NodeBalance node = {.node = NULL, .imbalanceIncreased = false};
+Dictionary* dictionaryEntryRemoveInternals(Dictionary* root, char* key) {
     if (root == NULL) {
-        return node;
+        return NULL;
     }
+    if (strcmp(key, root->key) < 0) {
+        root->left = dictionaryEntryRemoveInternals(root->left, key);
+    } else if (strcmp(key, root->key) > 0) {
+        root->right = dictionaryEntryRemoveInternals(root->right, key);
+    } else {
+        if (root->right == NULL) {
+            return root->left;
+        }
+        if (root->left == NULL) {
+            return root->right;
+        }
 
-    if (strcmp(key, root->key) == 0) {
-        TreeNode* old = root;
-        TreeNode* new = NULL;
+        Dictionary* old = root;
+        Dictionary* new = NULL;
         if (root->right != NULL) {
             new = treePullLeftMost(root->right);
             if (new != root->right) {
@@ -197,44 +174,18 @@ NodeBalance dictionaryEntryRemoveInternals(TreeNode* root, char* key) {
         }
 
         treeNodeFree(old);
-        updateBalance(new);
-        new = balanceTree(new);
-        node.imbalanceIncreased = true;
-        node.node = new;
-        return node;
-
-    } else if (strcmp(key, root->key) < 0) {
-        node = dictionaryEntryRemoveInternals(root->left, key);
-        root->left = node.node;
-        if (node.imbalanceIncreased) {
-            if (root->balance > 0) {
-                node.imbalanceIncreased = false;
-            }
-            root->balance++;
-        }
-    } else {
-        node = dictionaryEntryRemoveInternals(root->right, key);
-        root->right = node.node;
-        if (node.imbalanceIncreased) {
-            if (root->balance < 0) {
-                node.imbalanceIncreased = false;
-            }
-            root->balance--;
-        }
+        return balanceTree(new);
     }
 
-    root = balanceTree(root);
-
-    node.node = root;
-    return node;
+    return balanceTree(root);
 }
 
-void dictionaryEntryRemove(TreeNode** root, char* key) {
-    *root = dictionaryEntryRemoveInternals(*root, key).node;
+void dictionaryEntryRemove(Dictionary** root, char* key) {
+    *root = dictionaryEntryRemoveInternals(*root, key);
 }
 
-static TreeNode* dictionaryFindEntry(TreeNode* root, char* key) {
-    TreeNode* iter = root;
+static Dictionary* dictionaryFindEntry(Dictionary* root, char* key) {
+    Dictionary* iter = root;
     while (iter != NULL && strcmp(iter->key, key) != 0) {
         if (strcmp(key, iter->key) < 0) {
             iter = iter->left;
@@ -245,19 +196,19 @@ static TreeNode* dictionaryFindEntry(TreeNode* root, char* key) {
     return iter;
 }
 
-bool dictionaryHas(TreeNode* root, char* key) {
+bool dictionaryHas(Dictionary* root, char* key) {
     return dictionaryFindEntry(root, key) != NULL;
 }
 
-char* dictionaryGet(TreeNode* root, char* key) {
-    TreeNode* iter = dictionaryFindEntry(root, key);
+char* dictionaryGet(Dictionary* root, char* key) {
+    Dictionary* iter = dictionaryFindEntry(root, key);
     if (iter == NULL) {
         return NULL;
     }
     return iter->data;
 }
 
-void treeFree(TreeNode* root) {
+void treeFree(Dictionary* root) {
     if (root == NULL) {
         return;
     }
@@ -266,7 +217,7 @@ void treeFree(TreeNode* root) {
     treeNodeFree(root);
 }
 
-void dictionaryFree(TreeNode** root) {
+void dictionaryFree(Dictionary** root) {
     treeFree(*root);
     *root = NULL;
 }
