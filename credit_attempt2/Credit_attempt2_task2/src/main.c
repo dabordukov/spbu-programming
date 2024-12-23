@@ -32,6 +32,7 @@ int main(void) {
     for (int i = 0; i < 3; i++) {
         if (listAppend(list, startElements[i]) == 2) {
             fprintf(stderr, "Can't allocate node");
+            freeList(list);
             return 1;
         }
     }
@@ -39,8 +40,14 @@ int main(void) {
     printf("Исходный список:\n");
     printList(list);
 
-    listAppendStringsBeginningWithA(list);
+    if (listAppendStringsBeginningWithA(list) != 0) {
+        fprintf(stderr, "Can't allocate node");
+        freeList(list);
+        return 1;
+    }
 
     printf("Новый список:\n");
     printList(list);
+
+    freeList(list);
 }
