@@ -3,15 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void* checkedCalloc(size_t nmemb, size_t size) {
-    void* p = calloc(nmemb, size);
-    if (!p) {
-        fprintf(stderr, "Can't allocate %lu bytes of memory!\n", size);
-        abort();
-    }
-    return p;
-}
-
 struct stackElement {
     int value;
     struct stackElement* next;
@@ -23,14 +14,22 @@ typedef struct Stack {
 } Stack;
 
 Stack* stackInit() {
-    Stack* stack = checkedCalloc(1, sizeof(Stack));
+    Stack* stack = calloc(1, sizeof(Stack));
+    if (stack == NULL) {
+        return NULL;
+    }
+
     stack->size = 0;
     stack->top = NULL;
     return stack;
 }
 
-void stackPush(Stack* stack, int value) {
-    struct stackElement* element = checkedCalloc(1, sizeof(struct stackElement));
+int stackPush(Stack* stack, int value) {
+    struct stackElement* element = calloc(1, sizeof(struct stackElement));
+    if (element == NULL) {
+        return 1;
+    }
+
     element->next = stack->top;
     element->value = value;
     stack->top = element;
@@ -67,9 +66,9 @@ bool stackIsEmpty(Stack* stack) {
     return stack->size == 0;
 }
 
-int stackFree(Stack** stackPtr) {
+void stackFree(Stack** stackPtr) {
     if (stackPtr == NULL || *stackPtr == NULL) {
-        return 0;
+        return;
     }
     Stack* stack = *stackPtr;
 
@@ -81,5 +80,4 @@ int stackFree(Stack** stackPtr) {
 
     free(stack);
     *stackPtr = NULL;
-    return 0;
 }

@@ -8,12 +8,22 @@ typedef struct Stack Stack;
    else return popped value */
 int stackPop(Stack* stack, int* error);
 
-void stackPush(Stack* stack, int value);
+/* Return 0 on successfull pushing
+   Return 1 on allocation error */
+int stackPush(Stack* stack, int value);
+
+/* Return true if stack is empy
+   Otherwise, return false*/
 bool stackIsEmpty(Stack* stack);
 
 /* sets ERROR to 1 on empty stack
    else return top value */
 int stackTop(Stack* stack, int* error);
-int stackFree(Stack** stackPtr);
+
+/* Create stack */
 Stack* stackInit();
+
+/* Free stack */
+int stackFree(Stack** stackPtr);
+
 #endif

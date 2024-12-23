@@ -38,7 +38,6 @@ bool isBracketBalanced(char* string) {
         if (opposite != 0) {
             if (isOpeningBracket(string[i])) {
                 stackPush(stack, string[i]);
-
             } else if (stackPop(stack, &errorStack) != opposite) {
                 balanced = false;
                 break;
