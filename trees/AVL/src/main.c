@@ -4,27 +4,6 @@
 #include "dictionary.h"
 #include "ioAuxiliaries.h"
 
-void alternateBuffer() {
-#ifdef __linux__
-    static bool alternated = false;
-    if (!alternated) {
-        system("tput smcup");
-        alternated = true;
-    } else {
-        system("tput rmcup");
-        alternated = false;
-    }
-#endif
-    return;
-}
-
-void clearScreen() {
-#ifdef __linux__
-    system("clear");
-#endif
-    return;
-}
-
 const char menuMessage[] =
     "0) Выйти\n\
 1) Проверить наличие ключа\n\
@@ -100,31 +79,26 @@ int menu() {
     while (userChoice != '0') {
         puts(menuMessage);
         printf("Выберите действие: \n");
-        scanf("%c", &userChoice);
+        userChoice = getchar();
 
         switch (userChoice) {
             case '0':
                 return 0;
             case '1':
-                clearScreen();
                 checkExists();
                 break;
             case '2':
-                clearScreen();
                 getValue();
                 break;
             case '3':
-                clearScreen();
                 if (addEntry()) {
                     return 3;
                 }
                 break;
             case '4':
-                clearScreen();
                 removeEntry();
                 break;
             default:
-                clearScreen();
 
                 continue;
         }
@@ -140,11 +114,7 @@ int main() {
     setlocale(LC_CTYPE, "");
 #endif
 
-    alternateBuffer();
-    clearScreen();
-
     int res = menu();
-    alternateBuffer();
     if (res != 0) {
         printf("Что-то сломалось\n");
     }
