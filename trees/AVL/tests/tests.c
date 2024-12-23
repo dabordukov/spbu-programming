@@ -1,16 +1,17 @@
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "dictionary.h"
 
-typedef struct TreeNode {
-    struct TreeNode* left;
-    struct TreeNode* right;
+typedef struct Dictionary {
+    struct Dictionary* left;
+    struct Dictionary* right;
     char* data;
     char* key;
     int balance;
-} TreeNode;
+} Dictionary;
 
 void assertDictValue(Dictionary* dict, char* key, char* expected) {
     char* value = dictionaryGet(dict, key);
@@ -21,7 +22,17 @@ void assertDictValue(Dictionary* dict, char* key, char* expected) {
     assert(strcmp(value, expected) == 0);
 }
 
-int assertHeight(TreeNode* node) {
+int height(Dictionary* root) {
+    if (root == NULL)
+        return 0;
+
+    int lHeight = height(root->left);
+    int rHeight = height(root->right);
+
+    return (lHeight > rHeight ? lHeight : rHeight) + 1;
+}
+
+int assertHeight(Dictionary* node) {
     if (node == NULL) {
         return 1;
     }
@@ -35,11 +46,11 @@ void testCaseLeftLeft() {
     Dictionary* testDict = dictionaryCreate("Q", "");
     dictionaryInsert(&testDict, "P", "");
     dictionaryInsert(&testDict, "D", "");
-    assertHeight((TreeNode*)testDict);
+    assertHeight((Dictionary*)testDict);
     dictionaryInsert(&testDict, "L", "");
     dictionaryInsert(&testDict, "C", "");
     dictionaryInsert(&testDict, "B", "");
-    assertHeight((TreeNode*)testDict);
+    assertHeight((Dictionary*)testDict);
     dictionaryFree(&testDict);
 }
 
@@ -47,11 +58,11 @@ void testCaseRightRight() {
     Dictionary* testDict = dictionaryCreate("A", "");
     dictionaryInsert(&testDict, "B", "");
     dictionaryInsert(&testDict, "D", "");
-    assertHeight((TreeNode*)testDict);
+    assertHeight((Dictionary*)testDict);
     dictionaryInsert(&testDict, "E", "");
     dictionaryInsert(&testDict, "C", "");
     dictionaryInsert(&testDict, "F", "");
-    assertHeight((TreeNode*)testDict);
+    assertHeight((Dictionary*)testDict);
     dictionaryFree(&testDict);
 }
 
@@ -59,11 +70,11 @@ void testCaseLeftRight() {
     Dictionary* testDict = dictionaryCreate("Q", "");
     dictionaryInsert(&testDict, "E", "");
     dictionaryInsert(&testDict, "K", "");
-    assertHeight((TreeNode*)testDict);
+    assertHeight((Dictionary*)testDict);
     dictionaryInsert(&testDict, "C", "");
     dictionaryInsert(&testDict, "F", "");
     dictionaryInsert(&testDict, "G", "");
-    assertHeight((TreeNode*)testDict);
+    assertHeight((Dictionary*)testDict);
     dictionaryFree(&testDict);
 }
 
@@ -71,15 +82,28 @@ void testCaseRightLeft() {
     Dictionary* testDict = dictionaryCreate("A", "");
     dictionaryInsert(&testDict, "F", "");
     dictionaryInsert(&testDict, "B", "");
-    assertHeight((TreeNode*)testDict);
+    assertHeight((Dictionary*)testDict);
     dictionaryInsert(&testDict, "G", "");
     dictionaryInsert(&testDict, "E", "");
     dictionaryInsert(&testDict, "D", "");
-    assertHeight((TreeNode*)testDict);
+    assertHeight((Dictionary*)testDict);
     dictionaryFree(&testDict);
 }
 
+void testCaseManyElements() {
+    Dictionary* dict = dictionaryCreate("1", "");
+    char buffer[10] = {0};
+    for (int i = 1; i < 16384; i++) {
+        sprintf(buffer, "%d", i);
+        dictionaryInsert(&dict, buffer, "");
+    }
+
+    assert(height(dict) <= 1.44 * 14);
+    dictionaryFree(&dict);
+}
+
 int main() {
+    testCaseManyElements();
     // test creation and insertion
     Dictionary* testDictionary = dictionaryCreate("0", "first");
 
