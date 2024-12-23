@@ -3,14 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct stackElement {
+struct StackElement {
     int value;
-    struct stackElement* next;
+    struct StackElement* next;
 };
 
 typedef struct Stack {
     size_t size;
-    struct stackElement* top;
+    struct StackElement* top;
 } Stack;
 
 Stack* stackInit() {
@@ -25,7 +25,7 @@ Stack* stackInit() {
 }
 
 int stackPush(Stack* stack, int value) {
-    struct stackElement* element = calloc(1, sizeof(struct stackElement));
+    struct StackElement* element = calloc(1, sizeof(struct StackElement));
     if (element == NULL) {
         return 1;
     }
@@ -34,6 +34,7 @@ int stackPush(Stack* stack, int value) {
     element->value = value;
     stack->top = element;
     stack->size++;
+    return 0;
 }
 
 int stackPop(Stack* stack, int* error) {
@@ -44,7 +45,7 @@ int stackPop(Stack* stack, int* error) {
     }
 
     int popValue = stack->top->value;
-    struct stackElement* oldElement = stack->top;
+    struct StackElement* oldElement = stack->top;
     stack->top = oldElement->next;
     stack->size--;
     free(oldElement);
