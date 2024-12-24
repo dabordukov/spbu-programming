@@ -154,27 +154,31 @@ Dictionary* dictionaryEntryRemoveInternals(Dictionary* root, char* key) {
     } else if (strcmp(key, root->key) > 0) {
         root->right = dictionaryEntryRemoveInternals(root->right, key);
     } else {
+        Dictionary* new = NULL;
         if (root->right == NULL) {
-            return root->left;
+            new = root->left;
+            treeNodeFree(root);
+            return new;
         }
         if (root->left == NULL) {
-            return root->right;
+            new = root->right;
+            treeNodeFree(root);
+            return new;
         }
-
-        Dictionary* old = root;
-        Dictionary* new = NULL;
-        if (root->right != NULL) {
-            new = treePullLeftMost(root->right);
-            if (new != root->right) {
-                new->right = root->right;
+        if (root->left != NULL && root->right != NULL) {
+            if (root->right != NULL) {
+                new = treePullLeftMost(root->right);
+                if (new != root->right) {
+                    new->right = root->right;
+                }
+                new->left = root->left;
+            } else {
+                new = root->left;
             }
-            new->left = root->left;
-        } else {
-            new = root->left;
-        }
 
-        treeNodeFree(old);
-        return balanceTree(new);
+            treeNodeFree(root);
+            return balanceTree(new);
+        }
     }
 
     return balanceTree(root);

@@ -25,6 +25,7 @@ void checkExists() {
     } else {
         printf("Запись с ключом %s присутствует\n", key);
     }
+    free(key);
 }
 
 void getValue() {
@@ -39,6 +40,7 @@ void getValue() {
     } else {
         printf("[%s]: %s\n", key, dictionaryGet(dictionary, key));
     }
+    free(key);
 }
 
 int addEntry() {
@@ -60,6 +62,9 @@ int addEntry() {
         printf("Добавлено\n");
     }
 
+    free(key);
+    free(string);
+
     return res;
 }
 
@@ -72,6 +77,7 @@ void removeEntry() {
 
     dictionaryEntryRemove(&dictionary, key);
     printf("Удалено\n");
+    free(key);
 }
 
 int menu() {
