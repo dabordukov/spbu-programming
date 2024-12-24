@@ -105,7 +105,6 @@ int menu() {
                 removeEntry();
                 break;
             default:
-
                 continue;
         }
     }
