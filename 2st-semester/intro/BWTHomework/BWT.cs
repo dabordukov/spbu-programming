@@ -30,7 +30,7 @@ public class BWT
             transform += text[suffixes[i] - 1];
         }
 
-        return (transform, endOfText);
+        return (transform, endOfText + 1);
     }
 
     /// <summary>
@@ -52,13 +52,18 @@ public class BWT
             int occurrence_count = 0;
             for (int j = 0; j <= index; j++)
             {
+                if (j == endOfText)
+                {
+                    continue;
+                }
+
                 if (transform[j] == next)
                 {
                     occurrence_count++;
                 }
             }
 
-            for (int j = 0; j <= transform.Length; j++)
+            for (int j = 1; j < transform.Length; j++)
             {
                 if (sorted[j] == next)
                 {
