@@ -12,8 +12,19 @@ if (message is null)
 
 var (encoded, pos) = BWT.Encode(message);
 
-Console.WriteLine(encoded);
+Console.WriteLine($"Encoded message:\n{encoded}\n");
 
-Console.WriteLine(BWT.Decode(encoded, pos));
+var decoded = BWT.Decode(encoded, pos);
+
+Console.WriteLine($"Decoded message:\n{decoded}\n");
+
+if (message == decoded)
+{
+    Console.WriteLine("Message is restored correctly.");
+}
+else
+{
+    Console.WriteLine("Message is broken");
+}
 
 return 0;
