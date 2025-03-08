@@ -49,7 +49,7 @@ public class BWT
         {
             char next = transform[index];
             text = next + text;
-            int occurrence_count = 0;
+            int occurenceCount = 0;
             for (int j = 0; j <= index; j++)
             {
                 if (j == endOfText)
@@ -59,7 +59,7 @@ public class BWT
 
                 if (transform[j] == next)
                 {
-                    occurrence_count++;
+                    occurenceCount++;
                 }
             }
 
@@ -67,8 +67,8 @@ public class BWT
             {
                 if (sorted[j] == next)
                 {
-                    occurrence_count--;
-                    if (occurrence_count == 0)
+                    occurenceCount--;
+                    if (occurenceCount == 0)
                     {
                         index = j;
                         break;
