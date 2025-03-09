@@ -11,7 +11,7 @@ public class Trie
     /// <summary>
     /// Gets the number of words in the Trie.
     /// </summary>
-    public int Size => this.root.CountPrefixOf;
+    public int Size => this.root.NumberOfWords;
 
     /// <summary>
     /// Adds a word to the Trie.
@@ -34,7 +34,7 @@ public class Trie
         }
 
         var current = this.root;
-        current.CountPrefixOf++;
+        current.NumberOfWords++;
         foreach (var character in word)
         {
             if (!current.Children.TryGetValue(character, out Node? value))
@@ -44,7 +44,7 @@ public class Trie
             }
 
             current = value;
-            current.CountPrefixOf++;
+            current.NumberOfWords++;
         }
 
         current.IsEndOfWord = true;
@@ -97,11 +97,11 @@ public class Trie
         }
 
         var current = this.root;
-        current.CountPrefixOf--;
+        current.NumberOfWords--;
         foreach (var character in word)
         {
             current = current.Children[character];
-            current.CountPrefixOf--;
+            current.NumberOfWords--;
         }
 
         node.IsEndOfWord = false;
@@ -126,7 +126,7 @@ public class Trie
             return 0;
         }
 
-        return node.CountPrefixOf;
+        return node.NumberOfWords;
     }
 
     private Node? Find(string word)
@@ -149,7 +149,7 @@ public class Trie
     {
         public bool IsEndOfWord { get; set; } = false;
 
-        public int CountPrefixOf { get; set; } = 0;
+        public int NumberOfWords { get; set; } = 0;
 
         public Dictionary<char, Node> Children { get; set; } = [];
     }
