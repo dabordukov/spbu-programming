@@ -8,7 +8,7 @@ public class TrieTest
     [SetUp]
     public void Setup()
     {
-        this.trie = new Trie();
+        this.trie = new();
     }
 
     [Test]
