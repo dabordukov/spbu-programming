@@ -65,17 +65,7 @@ public class Trie
 
         var node = this.Find(word);
 
-        if (node is null)
-        {
-            return false;
-        }
-
-        if (node.IsEndOfWord)
-        {
-            return true;
-        }
-
-        return false;
+        return (node is not null) && (node.IsEndOfWord);
     }
 
     /// <summary>
