@@ -72,8 +72,6 @@ public class Lzw(int dictionaryMaxSize)
         writer.Write(value);
         frequencies[value]++;
 
-        Console.WriteLine(dictionary.Size);
-
         return frequencies;
     }
 
