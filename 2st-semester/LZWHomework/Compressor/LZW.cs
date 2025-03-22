@@ -3,17 +3,29 @@ namespace Compressor;
 /// <summary>
 /// LZW algorithm implementation.
 /// </summary>
-public class Lzw(int dictionaryMaxSize)
+public class Lzw
 {
-    private readonly int dictionaryMaxSize = dictionaryMaxSize;
+    private readonly int dictionaryMaxSize;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Lzw"/> class.
+    /// </summary>
+    /// <param name="dictionaryMaxSize">Maximum size of the dictionary.</param>
+    public Lzw(int dictionaryMaxSize = 4096)
+    {
+        if (dictionaryMaxSize < 256)
+        {
+            this.dictionaryMaxSize = 256;
+        }
+    }
 
     /// <summary>
     /// Encodes the file using the LZW algorithm.
     /// </summary>
     /// <param name="input">The file to be encoded.</param>
-    /// <param name="output">File to write encoded data.</param>
+    /// <param name="output">Stream to write encoded data.</param>
     /// <returns>Frequencies array.</returns>
-    public long[]? Encode(FileStream input, FileStream output)
+    public long[]? Encode(Stream input, Stream output)
     {
         BinaryWriter writer = new(output);
         Trie dictionary = new();
@@ -79,8 +91,8 @@ public class Lzw(int dictionaryMaxSize)
     /// Decodes the encoded sequence.
     /// </summary>
     /// <param name="input">Encoded sequence.</param>
-    /// <param name="output">File to write decoded data.</param>
-    public void Decode(FileStream input, FileStream output)
+    /// <param name="output">Stream to write decoded data.</param>
+    public void Decode(Stream input, Stream output)
     {
         BinaryReader reader = new(input);
         if (reader.BaseStream.Position >= reader.BaseStream.Length)
