@@ -17,6 +17,8 @@ public class Lzw
         {
             this.dictionaryMaxSize = 256;
         }
+
+        this.dictionaryMaxSize = dictionaryMaxSize;
     }
 
     /// <summary>
