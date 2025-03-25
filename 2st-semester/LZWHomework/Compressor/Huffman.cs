@@ -5,7 +5,6 @@ namespace Compressor;
 /// </summary>
 public class Huffman(int dictionaryMaxSize)
 {
-    private readonly int dictionaryMaxSize = dictionaryMaxSize;
     private readonly List<bool>[] codeTable = new List<bool>[dictionaryMaxSize];
 
     /// <summary>
