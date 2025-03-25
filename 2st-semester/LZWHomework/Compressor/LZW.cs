@@ -99,17 +99,18 @@ public class Lzw
     /// </summary>
     /// <param name="input">Encoded sequence.</param>
     /// <param name="output">Stream to write decoded data.</param>
-    public void Decode(Stream input, Stream output)
+    /// <returns>True if decoded successfully; otherwise false.</returns>
+    public bool Decode(Stream input, Stream output)
     {
         if (input is null || output is null)
         {
-            return;
+            return false;
         }
 
         BinaryReader reader = new(input);
         if (reader.BaseStream.Position >= reader.BaseStream.Length)
         {
-            return;
+            return false;
         }
 
         List<byte>[] codes = new List<byte>[this.dictionaryMaxSize];
@@ -121,6 +122,11 @@ public class Lzw
         int codesLength = 256;
 
         int previousCode = reader.ReadInt32();
+        if (codes[previousCode] is null)
+        {
+            return false;
+        }
+
         output.Write(codes[previousCode].ToArray());
         while (reader.BaseStream.Position != reader.BaseStream.Length)
         {
@@ -147,5 +153,7 @@ public class Lzw
 
             previousCode = code;
         }
+
+        return true;
     }
 }
