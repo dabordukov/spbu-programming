@@ -29,6 +29,11 @@ public class Lzw
     /// <returns>Frequencies array.</returns>
     public long[]? Encode(Stream input, Stream output)
     {
+        if (input is null || output is null)
+        {
+            return null;
+        }
+
         BinaryWriter writer = new(output);
         Trie dictionary = new();
         byte[] currentByteArray = new byte[1];
@@ -96,6 +101,11 @@ public class Lzw
     /// <param name="output">Stream to write decoded data.</param>
     public void Decode(Stream input, Stream output)
     {
+        if (input is null || output is null)
+        {
+            return;
+        }
+
         BinaryReader reader = new(input);
         if (reader.BaseStream.Position >= reader.BaseStream.Length)
         {
