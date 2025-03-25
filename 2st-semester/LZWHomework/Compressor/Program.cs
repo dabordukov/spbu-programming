@@ -67,6 +67,12 @@ switch (args[0])
 
         compressor.Decompress(args[1], unzippedFile);
         break;
+
+    default:
+        {
+            Console.WriteLine(helpMessage);
+            return 1;
+        }
 }
 
 return 0;
