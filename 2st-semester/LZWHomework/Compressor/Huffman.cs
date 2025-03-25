@@ -19,6 +19,11 @@ public class Huffman(int dictionaryMaxSize)
     {
         BinaryWriter writer = new(output);
         writer.Write(frequencies.Length);
+        if (frequencies.Sum() < 1)
+        {
+            return false;
+        }
+
         foreach (var frequency in frequencies)
         {
             writer.Write(frequency);
@@ -73,10 +78,6 @@ public class Huffman(int dictionaryMaxSize)
         }
 
         BinaryWriter writer = new(output);
-        if (reader.BaseStream.Position >= reader.BaseStream.Length)
-        {
-            return false;
-        }
 
         var frequenciesLength = reader.ReadInt32();
         var frequencies = new long[frequenciesLength];
@@ -94,6 +95,11 @@ public class Huffman(int dictionaryMaxSize)
             }
         }
 
+        if (decodedLength < 1)
+        {
+            return false;
+        }
+
         var root = BuildHuffmanTree(frequencies);
 
         byte buffer;
@@ -106,6 +112,9 @@ public class Huffman(int dictionaryMaxSize)
             buffer = reader.ReadByte();
             while (bufferIndex >= 0 && decodedLength > 0)
             {
+                currentNode = (buffer & (1 << bufferIndex)) == 0 ? currentNode.Left : currentNode.Right;
+                bufferIndex--;
+
                 if (currentNode is null)
                 {
                     return false;
@@ -117,10 +126,6 @@ public class Huffman(int dictionaryMaxSize)
                     decodedLength--;
                     currentNode = root;
                 }
-
-                currentNode = (buffer & (1 << bufferIndex)) == 0 ? currentNode.Left : currentNode.Right;
-
-                bufferIndex--;
             }
         }
 
