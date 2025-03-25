@@ -13,6 +13,7 @@ if (args.Length != 2)
     return 1;
 }
 
+Compressor.Compressor compressor = new();
 switch (args[0])
 {
     case "-c":
@@ -33,7 +34,7 @@ switch (args[0])
             }
         }
 
-        Compressor.Compressor.Compress(args[1], zippedFile);
+        compressor.Compress(args[1], zippedFile);
         var oldSize = new System.IO.FileInfo(args[1]).Length;
         var newSize = new System.IO.FileInfo(zippedFile).Length;
         Console.WriteLine($"Old size: {oldSize} Bytes\nNew size: {newSize} Bytes\nCompression ratio: {(float)oldSize / (float)newSize}");
@@ -64,7 +65,7 @@ switch (args[0])
             }
         }
 
-        Compressor.Compressor.Decompress(args[1], unzippedFile);
+        compressor.Decompress(args[1], unzippedFile);
         break;
 }
 

@@ -3,13 +3,23 @@ namespace Compressor;
 /// <summary>
 /// Compressor class.
 /// </summary>
-public static class Compressor
+public class Compressor
 {
-    private const int DictionaryMaxSize = 4096;
+    private readonly int dictionaryMaxSize;
 
-    private static readonly Lzw LzwCompression = new(DictionaryMaxSize);
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Compressor"/> class.
+    /// </summary>
+    /// <param name="dictionaryMaxSize">Maximum size of the dictionary.</param>
+    public Compressor(int dictionaryMaxSize = 4096)
+    {
+        if (dictionaryMaxSize < 256)
+        {
+            this.dictionaryMaxSize = 256;
+        }
 
-    private static readonly Huffman HuffmanCompression = new(DictionaryMaxSize);
+        this.dictionaryMaxSize = dictionaryMaxSize;
+    }
 
     /// <summary>
     /// Compresses the file.
@@ -17,15 +27,17 @@ public static class Compressor
     /// <param name="inFile">The path to the file to be compressed.</param>
     /// <param name="outFile">The path to the file the compressed data to be written to.</param>
     /// <returns>true if the file was compressed successfully; otherwise false.</returns>
-    public static bool Compress(string inFile, string outFile)
+    public bool Compress(string inFile, string outFile)
     {
-        string tempFile = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString();
+        Lzw lzwCompression = new(this.dictionaryMaxSize);
+        Huffman huffmanCompression = new(this.dictionaryMaxSize);
+        string tempFile = Path.GetTempFileName();
 
         long[]? frequencies;
         using (var input = File.OpenRead(inFile))
         using (var output = File.OpenWrite(tempFile))
         {
-            frequencies = LzwCompression.Encode(input, output);
+            frequencies = lzwCompression.Encode(input, output);
         }
 
         if (frequencies is null)
@@ -35,13 +47,13 @@ public static class Compressor
 
         if (File.Exists(outFile))
         {
-            File.Delete(outFile);
+            return false;
         }
 
         using (var output = File.OpenWrite(outFile))
         using (var input = File.OpenRead(tempFile))
         {
-            HuffmanCompression.Encode(input, output, frequencies);
+            huffmanCompression.Encode(input, output, frequencies);
         }
 
         return true;
@@ -53,24 +65,27 @@ public static class Compressor
     /// <param name="inFile">The path to the file to be decompressed.</param>
     /// <param name="outFile">The path to the file the decompressed data to be written to.</param>
     /// <returns>true if the file was decompressed successfully; otherwise false.</returns>
-    public static bool Decompress(string inFile, string outFile)
+    public bool Decompress(string inFile, string outFile)
     {
-        var tempFile = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString();
+        Lzw lzwCompression = new(this.dictionaryMaxSize);
+        Huffman huffmanCompression = new(this.dictionaryMaxSize);
+
+        var tempFile = Path.GetTempFileName();
         using (var input = File.OpenRead(inFile))
         using (var output = File.OpenWrite(tempFile))
         {
-            HuffmanCompression.Decode(input, output);
+            huffmanCompression.Decode(input, output);
         }
 
         if (File.Exists(outFile))
         {
-            File.Delete(outFile);
+            return false;
         }
 
         using (var input = File.OpenRead(tempFile))
         using (var output = File.OpenWrite(outFile))
         {
-            LzwCompression.Decode(input, output);
+            lzwCompression.Decode(input, output);
         }
 
         return true;
