@@ -29,6 +29,11 @@ public class Compressor
     /// <returns>true if the file was compressed successfully; otherwise false.</returns>
     public bool Compress(string inFile, string outFile)
     {
+        if (inFile is null || outFile is null)
+        {
+            return false;
+        }
+
         Lzw lzwCompression = new(this.dictionaryMaxSize);
         Huffman huffmanCompression = new(this.dictionaryMaxSize);
         string tempFile = Path.GetTempFileName();
