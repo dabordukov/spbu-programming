@@ -42,6 +42,11 @@ public class Compressor
         using (var input = File.OpenRead(inFile))
         using (var output = File.OpenWrite(tempFile))
         {
+            if (input is null || output is null)
+            {
+                return false;
+            }
+
             frequencies = lzwCompression.Encode(input, output);
         }
 
