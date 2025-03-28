@@ -8,10 +8,18 @@ public class Lzw
     private readonly int dictionaryMaxSize;
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="Lzw"/> class with default dictionary size.
+    /// </summary>
+    public Lzw()
+    {
+        this.dictionaryMaxSize = 4096;
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Lzw"/> class.
     /// </summary>
     /// <param name="dictionaryMaxSize">Maximum size of the dictionary.</param>
-    public Lzw(int dictionaryMaxSize = 4096)
+    public Lzw(int dictionaryMaxSize)
     {
         if (dictionaryMaxSize < 256)
         {
@@ -34,7 +42,12 @@ public class Lzw
             return null;
         }
 
-        BinaryWriter writer = new(output);
+        var writer = new BinaryWriter(output);
+        if (writer is null)
+        {
+            return null;
+        }
+
         Trie dictionary = new();
         byte[] currentByteArray = new byte[1];
         ReadOnlySpan<byte> currentByte = new(currentByteArray);
@@ -107,7 +120,12 @@ public class Lzw
             return false;
         }
 
-        BinaryReader reader = new(input);
+        var reader = new BinaryReader(input);
+        if (reader is null)
+        {
+            return false;
+        }
+
         if (reader.BaseStream.Position >= reader.BaseStream.Length)
         {
             return false;
