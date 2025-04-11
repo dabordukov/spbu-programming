@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPriorityQueue.Test", "MyPriorityQueue.Test\MyPriorityQueue.Test.csproj", "{CF857A17-38BA-4A2E-9FAB-7C14EFDB2F65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPriorityQueue", "MyPriorityQueue\MyPriorityQueue.csproj", "{28EBE2C2-4B36-452D-A9B9-6E25DD93D76D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CF857A17-38BA-4A2E-9FAB-7C14EFDB2F65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF857A17-38BA-4A2E-9FAB-7C14EFDB2F65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF857A17-38BA-4A2E-9FAB-7C14EFDB2F65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF857A17-38BA-4A2E-9FAB-7C14EFDB2F65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28EBE2C2-4B36-452D-A9B9-6E25DD93D76D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28EBE2C2-4B36-452D-A9B9-6E25DD93D76D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28EBE2C2-4B36-452D-A9B9-6E25DD93D76D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28EBE2C2-4B36-452D-A9B9-6E25DD93D76D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
