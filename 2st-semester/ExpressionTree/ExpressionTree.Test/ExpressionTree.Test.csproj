@@ -28,4 +28,8 @@
     <ProjectReference Include="..\ExpressionTree\ExpressionTree.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="stylecop.json" />
+  </ItemGroup>
+
 </Project>
