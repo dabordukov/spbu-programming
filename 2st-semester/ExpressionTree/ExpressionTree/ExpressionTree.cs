@@ -218,7 +218,7 @@ public class ExpressionTree
             }
 
             Console.Write('(');
-            Console.Write(this.Operation);
+            Console.Write((char)this.Operation);
             Console.Write(' ');
             this.LeftOperand.Print();
             Console.Write(' ');
