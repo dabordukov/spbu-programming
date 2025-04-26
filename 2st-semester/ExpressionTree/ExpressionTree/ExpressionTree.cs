@@ -173,6 +173,7 @@ public class ExpressionTree
         }
 
         this.root.Print();
+        Console.WriteLine();
     }
 
     private static bool IsDigit(int character)
