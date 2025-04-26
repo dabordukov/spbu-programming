@@ -107,8 +107,16 @@ public class ExpressionTree
                         break;
                     }
 
-                    currentNode = stack.Pop();
                 }
+            }
+            else if (token == Parser.Token.TreeEnd)
+            {
+                if (currentNode.LeftOperand is null || currentNode.RightOperand is null)
+                {
+                    throw new FormatException();
+                }
+                currentNode = stack.Pop();
+
             }
         }
 
@@ -195,10 +203,10 @@ public class ExpressionTree
 
             return this.Operation switch
             {
-                Operation.Plus => this.LeftOperand.Evaluate() + this.RightOperand.Evaluate(),
-                Operation.Minus => this.LeftOperand.Evaluate() - this.RightOperand.Evaluate(),
-                Operation.Divide => this.LeftOperand.Evaluate() / this.RightOperand.Evaluate(),
-                Operation.Multiply => this.LeftOperand.Evaluate() * this.RightOperand.Evaluate(),
+                Operation.Plus => checked(this.LeftOperand.Evaluate() + this.RightOperand.Evaluate()),
+                Operation.Minus => checked(this.LeftOperand.Evaluate() - this.RightOperand.Evaluate()),
+                Operation.Divide => checked(this.LeftOperand.Evaluate() / this.RightOperand.Evaluate()),
+                Operation.Multiply => checked(this.LeftOperand.Evaluate() * this.RightOperand.Evaluate()),
                 _ => throw new ArgumentException("Invalid expression"),
             };
         }

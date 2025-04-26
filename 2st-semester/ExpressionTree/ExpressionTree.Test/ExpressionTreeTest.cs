@@ -7,12 +7,6 @@ namespace ExpressionTree.Test;
 
 public class ExpressionTreeTest
 {
-    private static readonly (string Expression, int Expected)[] CorrectExpressions =
-    [("(+ (* (+ 44 1) 5) (* (+ 1 1) 2))", 229),
-     ("(/ (* (+ 44 1) 5) (+ (+ 2 1) 2))", 45),
-     ("(/ (* (+ 44 1) 5) (- (+ 2 1) 8))", -45),
-     ("(/ (* (+ -44 1) 5) (- (+ 2 1) 8))", 43)];
-
     private string tempDirectory;
 
     [OneTimeSetUp]
@@ -31,14 +25,49 @@ public class ExpressionTreeTest
         }
     }
 
-    [Test]
-    public void CorrectExpressionShouldBeEvaluatedCorrectly([ValueSource(nameof(CorrectExpressions))] (string Expression, int Expected) correctExpression)
+    [TestCase("(+ (* (+ 44 1) 5) (* (+ 1 1) 2))", ExpectedResult = 229)]
+    [TestCase("(/ (* (+ 44 1) 5) (+ (+ 2 1) 2))", ExpectedResult = 45)]
+    [TestCase("(/ (* (+ 44 1) 5) (- (+ 2 1) 8))", ExpectedResult = -45)]
+    [TestCase("(/ (* (+ -44 1) 5) (- (+ 2 1) 8))", ExpectedResult = 43)]
+    [TestCase("(/ (* (- 44 1) 5) (- (+ 2 1) 8))", ExpectedResult = -43)]
+    public int CorrectExpressionShouldBeEvaluatedCorrectly(string expression)
     {
         var filename = Path.Combine(this.tempDirectory, "correct.txt");
-        File.WriteAllText(filename, correctExpression.Expression);
+        File.WriteAllText(filename, expression);
 
         var tree = new ExpressionTree(filename);
-        var result = tree.Evaluate();
-        Assert.That(result, Is.EqualTo(correctExpression.Expected));
+        return tree.Evaluate();
+    }
+
+    [TestCase("(/ (* (+ -44 1) 5) (- (+ 2 ) 8))")]
+    [TestCase("(/ (* (+ -44 1) 5) (- (+ 2 1) ))")]
+    [TestCase("(/ (* (-44 1) 5) (- (+ 2 1) 8))")]
+    [TestCase("()")]
+    [TestCase("(* 1 2")]
+    [TestCase("* 1 2)")]
+    public void ExpressionWith_EmptyToken_ShouldThrowFormatException(string expression)
+    {
+        var filename = Path.Combine(this.tempDirectory, "correct.txt");
+        File.WriteAllText(filename, expression);
+
+        Assert.Throws<FormatException>(() => new ExpressionTree(filename));
+    }
+
+    [TestCase("(+ 9999999999999 1)")]
+    public void ExpressionWith_NumberNotFittinIn_Int32_ShouldThrowOverflowException(string expression)
+    {
+        var filename = Path.Combine(this.tempDirectory, "correct.txt");
+        File.WriteAllText(filename, expression);
+
+        Assert.Throws<OverflowException>(() => new ExpressionTree(filename));
+    }
+
+    [TestCase("(* 1073741824 8)")]
+    public void ExpressionWith_ArithemticOverflow_ShouldThrowOverflowException(string expression)
+    {
+        var filename = Path.Combine(this.tempDirectory, "correct.txt");
+        File.WriteAllText(filename, expression);
+        var tree = new ExpressionTree(filename);
+        Assert.Throws<OverflowException>(() => tree.Evaluate());
     }
 }
