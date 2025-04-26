@@ -106,7 +106,6 @@ public class ExpressionTree
                     {
                         break;
                     }
-
                 }
             }
             else if (token == Parser.Token.TreeEnd)
@@ -115,8 +114,8 @@ public class ExpressionTree
                 {
                     throw new FormatException();
                 }
-                currentNode = stack.Pop();
 
+                currentNode = stack.Pop();
             }
         }
 
