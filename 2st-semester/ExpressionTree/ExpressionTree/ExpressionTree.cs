@@ -339,7 +339,7 @@ public class ExpressionTree
         private void TrimLeadingWhitespaces()
         {
             int nextByte = -1;
-            while ((nextByte = this.stream.ReadByte()) == ' ' || nextByte == '\t')
+            while ((nextByte = this.stream.ReadByte()) == ' ' || nextByte == '\t' || nextByte == '\n')
             {
             }
 
