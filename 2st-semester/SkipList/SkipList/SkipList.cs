@@ -6,6 +6,8 @@
 namespace SkipList;
 
 using System.Collections;
+using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
 
 /// <summary>
 /// Implements a skip list.
@@ -13,11 +15,13 @@ using System.Collections;
 /// <typeparam name="T">The type of elements in the list.</typeparam>
 public class SkipList<T> : IList<T>
 {
+    private static readonly int MaxLevels = 48;
     private IComparer<T> comparer;
-    private LevelGenerator generator = new LevelGenerator();
+    private LevelGenerator generator = new(MaxLevels);
     private int size = 0;
     private int levels = 1;
-    private Node?[] head = null;
+    private Node?[] head = new Node[1];
+    private uint generation = 0;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SkipList{T}"/> class.
@@ -48,47 +52,81 @@ public class SkipList<T> : IList<T>
     /// <summary>
     /// Gets a value indicating whether the list is read-only.
     /// </summary>
-    public bool IsReadOnly => true;
+    public bool IsReadOnly => false;
 
     /// <summary>
     /// Set or Gets element at the given index.
     /// </summary>
     /// <param name="index">The index of the element to get or set.</param>
     /// <returns>The value of the element to get or the value to set.</returns>
-    public T this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public T this[int index] { get => throw new NotImplementedException(); set => throw new NotSupportedException(); }
 
     public void Add(T item)
     {
-        Node?[] update = new Node[this.levels];
-        var next = this.head[this.levels - 1];
+        var oldLevels = this.levels;
+        var nodeLevel = this.generator.Next();
+        var newNode = new Node(item, nodeLevel + 1);
+
+        if (nodeLevel > this.levels)
+        {
+            Array.Resize(ref this.head, nodeLevel + 1);
+            this.levels = nodeLevel + 1;
+        }
+
+        var update = new Node?[this.levels];
+        var current = this.head[oldLevels - 1];
+        if (current is null) // only if size == 0
+        {
+            for (int i = 0; i < this.levels; i++)
+            {
+                this.head[i] = newNode;
+            }
+
+            this.generation++;
+            this.size++;
+            return;
+        }
+
+        // for (int i = oldLevels; i < this.levels; i++)
+        // {
+        //     update[i] = this.head[i]; // filling new higher levels
+        // }
+
         for (int i = this.levels - 1; i >= 0; i--)
         {
-            while (next is not null && this.comparer.Compare(item, next.Value) <= 0)
+            while (current is not null)
             {
-                next = next.Next[i];
+                if (this.comparer.Compare(current.Value, item) < 0)
+                {
+                    update[i] = current;
+                    if (current.Next[i] is null)
+                    {
+                        break;
+                    }
+
+                    current = current.Next[i];
+                }
+                else
+                {
+                    current = update[i];
+                    break;
+                }
+            }
+        }
+
+        for (int i = 0; i < newNode.Levels; i++)
+        {
+            if (update[i] is null)
+            {
+                throw new InvalidDataException();
             }
 
-            update[i] = next;
-        }
-
-        var newLevel = this.generator.Next();
-        if (newLevel > this.levels - 1)
-        {
-            Array.Resize(ref this.head, newLevel);
-            Array.Resize(ref update, newLevel);
-            this.levels = newLevel + 1;
-        }
-
-        var newNode = new Node(item, newLevel + 1);
-
-        for (int i = 0; i < this.levels; i++)
-        {
             newNode.Next[i] = update[i]?.Next[i];
-            if (update[i] is not null)
-            {
-                update[i].Next[i] = newNode;
-            }
+            update[i] = newNode;
         }
+
+        this.generation++;
+        this.size++;
     }
 
     public void Clear()
@@ -142,11 +180,19 @@ public class SkipList<T> : IList<T>
         return GetEnumerator();
     }
 
-    private class LevelGenerator : Random
+    private class LevelGenerator(int maxLevels) : Random
     {
+        private readonly int maxLevels = maxLevels;
+
         public override int Next()
         {
-            return -(int)Math.Ceiling(Math.Log2(this.Sample()));
+            var value = Math.Log2(this.Sample());
+            if (-value >= this.maxLevels)
+            {
+                return this.maxLevels;
+            }
+
+            return -(int)value;
         }
     }
 
@@ -156,6 +202,6 @@ public class SkipList<T> : IList<T>
 
         public Node?[] Next { get; set; } = new Node[levels];
 
-        public int[] Length { get; set; } = new int[levels];
+        public int Levels { get; } = levels;
     }
 }
