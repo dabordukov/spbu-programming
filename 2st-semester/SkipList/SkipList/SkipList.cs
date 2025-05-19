@@ -6,8 +6,7 @@
 namespace SkipList;
 
 using System.Collections;
-using System.ComponentModel.DataAnnotations;
-using System.Data.Common;
+using System.Transactions;
 
 /// <summary>
 /// Implements a skip list.
@@ -45,6 +44,12 @@ public class SkipList<T> : IList<T>
     }
 
     /// <summary>
+    /// Gets the generation of the skip list.
+    /// </summary>
+    public uint GetGeneration
+        => this.generation;
+
+    /// <summary>
     /// Gets the number of elements in the list.
     /// </summary>
     public int Count => this.size;
@@ -59,15 +64,47 @@ public class SkipList<T> : IList<T>
     /// </summary>
     /// <param name="index">The index of the element to get or set.</param>
     /// <returns>The value of the element to get or the value to set.</returns>
-    public T this[int index] { get => throw new NotImplementedException(); set => throw new NotSupportedException(); }
+    public T this[int index]
+    {
+        get
+        {
+            if (index < 0)
+            {
+                throw new InvalidOperationException();
+            }
 
+            Node? current = this.head[0];
+            while (index-- > 0)
+            {
+                if (current is null)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+
+                current = current.Next[0];
+            }
+
+            if (current is null)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            return current.Value;
+        }
+        set => throw new NotSupportedException();
+    }
+
+    /// <summary>
+    /// Adds an element to the list.
+    /// </summary>
+    /// <param name="item">The element to add.</param>
     public void Add(T item)
     {
         var oldLevels = this.levels;
         var nodeLevel = this.generator.Next();
         var newNode = new Node(item, nodeLevel + 1);
 
-        if (nodeLevel > this.levels)
+        if (nodeLevel >= this.levels)
         {
             Array.Resize(ref this.head, nodeLevel + 1);
             this.levels = nodeLevel + 1;
@@ -87,10 +124,10 @@ public class SkipList<T> : IList<T>
             return;
         }
 
-        // for (int i = oldLevels; i < this.levels; i++)
-        // {
-        //     update[i] = this.head[i]; // filling new higher levels
-        // }
+        for (int i = oldLevels; i < this.levels; i++)
+        {
+            update[i] = this.head[i]; // filling new higher levels
+        }
 
         for (int i = this.levels - 1; i >= 0; i--)
         {
@@ -118,11 +155,14 @@ public class SkipList<T> : IList<T>
         {
             if (update[i] is null)
             {
-                throw new InvalidDataException();
+                newNode.Next[i] = this.head[i];
+                this.head[i] = newNode;
             }
-
-            newNode.Next[i] = update[i]?.Next[i];
-            update[i] = newNode;
+            else
+            {
+                newNode.Next[i] = update[i]!.Next[i];
+                update[i]!.Next[i] = newNode;
+            }
         }
 
         this.generation++;
@@ -178,6 +218,88 @@ public class SkipList<T> : IList<T>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    private class Enumerator(SkipList<T> list) : IEnumerator<T>
+    {
+        private readonly SkipList<T> list = list;
+        private readonly uint generation = list.GetGeneration;
+        private bool disposed = false;
+        private bool reseted = true;
+
+        private Node? current = null;
+
+        /// <summary>
+        /// Gets the current element in the enumerator.
+        /// </summary>
+        public T Current
+        {
+            get
+            {
+
+                if (this.disposed || this.generation != this.list.GetGeneration || this.current is null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return this.current.Value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the current element in the enumerator.
+        /// </summary>
+        object IEnumerator.Current => this.Current!;
+
+        /// <summary>
+        /// Disposes the enumerator.
+        /// </summary>
+        public void Dispose()
+        {
+            this.disposed = true;
+        }
+
+        /// <summary>
+        /// Moves to the next element in the enumerator.
+        /// </summary>
+        /// <returns>True if the enumerator was successfully moved to the next element; otherwise, false.</returns>
+        public bool MoveNext()
+        {
+            if (this.disposed || this.generation != this.list.GetGeneration)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (this.reseted)
+            {
+                this.current = this.list.head[0];
+                this.reseted = false;
+                return true;
+            }
+
+            if (this.current is null)
+            {
+                return false;
+            }
+
+            this.current = this.current.Next[0];
+            this.reseted = false;
+            return true;
+        }
+
+        /// <summary>
+        /// Resets the enumerator to its initial position.
+        /// </summary>
+        public void Reset()
+        {
+            if (this.disposed)
+            {
+                throw new InvalidOperationException();
+            }
+
+            this.current = null;
+            this.reseted = true;
+        }
     }
 
     private class LevelGenerator(int maxLevels) : Random
