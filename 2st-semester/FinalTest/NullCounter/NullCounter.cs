@@ -8,7 +8,6 @@ namespace NullCounter;
 /// <summary>
 /// This class is used to count the number of null elements in a list.
 /// </summary>
-/// <typeparam name="T"> The type of the object to check for null.</typeparam>
 public class NullCounter
 {
     /// <summary>
