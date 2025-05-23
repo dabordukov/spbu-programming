@@ -18,7 +18,7 @@ public class NullCounter
     /// <param name="list"> The list to check for null elements.</param>
     /// <param name="checker"> The null checker to use.</param>
     /// <returns>The number of null elements in the list.</returns>
-    public int CountNullElements<T>(List<T> list, INullChecker<T> checker)
+    public static int CountNullElements<T>(MyList<T> list, INullChecker<T> checker)
     {
         ArgumentNullException.ThrowIfNull(list);
         ArgumentNullException.ThrowIfNull(checker);
