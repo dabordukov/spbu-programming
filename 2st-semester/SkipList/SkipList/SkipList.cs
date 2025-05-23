@@ -226,7 +226,6 @@ public class SkipList<T> : IList<T>
         private readonly uint generation = list.GetGeneration;
         private bool disposed = false;
         private bool reseted = true;
-
         private Node? current = null;
 
         /// <summary>
@@ -236,7 +235,6 @@ public class SkipList<T> : IList<T>
         {
             get
             {
-
                 if (this.disposed || this.generation != this.list.GetGeneration || this.current is null)
                 {
                     throw new InvalidOperationException();
