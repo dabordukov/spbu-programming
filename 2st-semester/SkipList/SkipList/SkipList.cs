@@ -6,7 +6,6 @@
 namespace SkipList;
 
 using System.Collections;
-using System.Transactions;
 
 /// <summary>
 /// Implements a skip list.
@@ -129,7 +128,7 @@ public class SkipList<T> : IList<T>
             update[i] = this.head[i]; // filling new higher levels
         }
 
-        for (int i = this.levels - 1; i >= 0; i--)
+        for (int i = oldLevels - 1; i >= 0; i--)
         {
             while (current is not null)
             {
@@ -145,7 +144,11 @@ public class SkipList<T> : IList<T>
                 }
                 else
                 {
-                    current = update[i];
+                    if (i > 0)
+                    {
+                        current = this.head[i - 1];
+                    }
+
                     break;
                 }
             }
