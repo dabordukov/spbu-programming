@@ -172,29 +172,96 @@ public class SkipList<T> : IList<T>
         this.size++;
     }
 
+    /// <summary>
+    /// Removes all elements from the list.
+    /// </summary>
     public void Clear()
     {
-        throw new NotImplementedException();
+        this.head = new Node[1];
+        this.levels = 1;
+        this.size = 0;
+        this.generation++;
     }
 
+    /// <summary>
+    /// Checks if the list contains a specific item.
+    /// </summary>
+    /// <param name="item"> The item to check for.</param>
+    /// <returns> True if the item is found in the list; otherwise, false.</returns>
     public bool Contains(T item)
     {
-        throw new NotImplementedException();
+        var current = this.head[this.levels - 1];
+
+        for (int i = this.levels - 1; i >= 0; i--)
+        {
+            while (current?.Next[i] != null && this.comparer.Compare(current.Next[i]!.Value, item) < 0)
+            {
+                current = current.Next[i];
+            }
+        }
+
+        current = current?.Next[0];
+        return current != null && this.comparer.Compare(current.Value, item) == 0;
     }
 
+    /// <summary>
+    /// Copies the elements of the list to an array, starting at a specified array index.
+    /// </summary>
+    /// <param name="array"> The array to copy the elements to.</param>
+    /// <param name="arrayIndex"> The index at which copying begins.</param>
     public void CopyTo(T[] array, int arrayIndex)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(array);
+
+        ArgumentOutOfRangeException.ThrowIfNegative(arrayIndex);
+
+        if (array.Length - arrayIndex < this.size)
+        {
+            throw new ArgumentException("Not enough space");
+        }
+
+        var current = this.head[0];
+        var currentIndex = arrayIndex;
+
+        while (current != null)
+        {
+            array[currentIndex] = current.Value;
+            current = current.Next[0];
+            currentIndex++;
+        }
     }
 
+    /// <summary>
+    /// Gets an enumerator that iterates through the list.
+    /// </summary>
+    /// <returns> An enumerator for the list.</returns>
     public IEnumerator<T> GetEnumerator()
     {
-        throw new NotImplementedException();
+        return new Enumerator(this);
     }
 
+    /// <summary>
+    /// Gets the index of the specified item in the list.
+    /// </summary>
+    /// <param name="item"> The item to find the index of.</param>
+    /// <returns> The index of the item in the list, or -1 if the item is not found.</returns>
     public int IndexOf(T item)
     {
-        throw new NotImplementedException();
+        var current = this.head[0];
+        var index = 0;
+
+        while (current != null)
+        {
+            if (this.comparer.Compare(current.Value, item) == 0)
+            {
+                return index;
+            }
+
+            current = current.Next[0];
+            index++;
+        }
+
+        return -1;
     }
 
     /// <summary>
@@ -202,25 +269,118 @@ public class SkipList<T> : IList<T>
     /// </summary>
     /// <param name="index">The index at which to insert the element.</param>
     /// <param name="item">The element to insert.</param>
-    /// <exception cref="NotSupportedException"> The list does not support insertion.</exception>
     public void Insert(int index, T item)
     {
         throw new NotSupportedException();
     }
 
+    /// <summary>
+    /// Removes the first occurrence of a specific item from the list.
+    /// </summary>
+    /// <param name="item"> The item to remove.</param>
+    /// <returns> True if the item was successfully removed; otherwise, false.</returns>
     public bool Remove(T item)
     {
-        throw new NotImplementedException();
+        var update = new Node?[this.levels];
+        var current = this.head[this.levels - 1];
+
+        for (int i = this.levels - 1; i >= 0; i--)
+        {
+            while (current?.Next[i] != null && this.comparer.Compare(current.Next[i]!.Value, item) < 0)
+            {
+                current = current.Next[i];
+            }
+
+            update[i] = current;
+        }
+
+        current = current?.Next[0];
+
+        if (current != null && this.comparer.Compare(current.Value, item) == 0)
+        {
+            for (int i = 0; i < this.levels; i++)
+            {
+                if (update[i]?.Next[i] != current)
+                {
+                    break;
+                }
+
+                update[i]!.Next[i] = current.Next[i];
+            }
+
+            while (this.levels > 1 && this.head[this.levels - 1] == null)
+            {
+                this.levels--;
+            }
+
+            this.size--;
+            this.generation++;
+            return true;
+        }
+
+        return false;
     }
 
+    /// <summary>
+    /// Removes the element at the specified index.
+    /// </summary>
+    /// <param name="index"> The index of the element to remove.</param>
     public void RemoveAt(int index)
     {
-        throw new NotImplementedException();
+        if (index < 0 || index >= this.size)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        var update = new Node?[this.levels];
+        var current = this.head[this.levels - 1];
+        var currentIndex = -1;
+
+        for (int i = this.levels - 1; i >= 0; i--)
+        {
+            while (current?.Next[i] != null && currentIndex < index - 1)
+            {
+                current = current.Next[i];
+                if (i == 0)
+                {
+                    currentIndex++;
+                }
+            }
+
+            update[i] = current;
+        }
+
+        current = current?.Next[0];
+
+        if (current != null)
+        {
+            for (int i = 0; i < this.levels; i++)
+            {
+                if (update[i]?.Next[i] != current)
+                {
+                    break;
+                }
+
+                update[i]!.Next[i] = current.Next[i];
+            }
+
+            while (this.levels > 1 && this.head[this.levels - 1] == null)
+            {
+                this.levels--;
+            }
+
+            this.size--;
+            this.generation++;
+        }
     }
 
+    /// <summary>
+    /// Gets an enumerator that iterates through the list.
+    /// </summary>
+    /// <returns> An enumerator for the list.</returns>
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return GetEnumerator();
+        return this.GetEnumerator();
     }
 
     private class Enumerator(SkipList<T> list) : IEnumerator<T>
