@@ -6,6 +6,7 @@
 namespace SkipList;
 
 using System.Collections;
+using System.Security.Principal;
 
 /// <summary>
 /// Implements a skip list.
@@ -200,7 +201,11 @@ public class SkipList<T> : IList<T>
             }
         }
 
-        current = current?.Next[0];
+        if (current is not null && this.comparer.Compare(current.Value, item) != 0)
+        {
+            current = current?.Next[0];
+        }
+
         return current != null && this.comparer.Compare(current.Value, item) == 0;
     }
 
@@ -284,41 +289,67 @@ public class SkipList<T> : IList<T>
         var update = new Node?[this.levels];
         var current = this.head[this.levels - 1];
 
+        Node? toDelete = null;
+
         for (int i = this.levels - 1; i >= 0; i--)
         {
-            while (current?.Next[i] != null && this.comparer.Compare(current.Next[i]!.Value, item) < 0)
+            if (current != null && this.comparer.Compare(current.Value, item) > 0)
+            {
+                current = this.head[i];
+            }
+
+            while (current!.Next[i] != null && this.comparer.Compare(current.Next[i]!.Value, item) <= 0)
             {
                 current = current.Next[i];
             }
 
-            update[i] = current;
+            if (current != null && this.comparer.Compare(current.Value, item) == 0)
+            {
+                toDelete = current;
+                break;
+            }
         }
 
-        current = current?.Next[0];
-
-        if (current != null && this.comparer.Compare(current.Value, item) == 0)
+        if (toDelete is null)
         {
-            for (int i = 0; i < this.levels; i++)
-            {
-                if (update[i]?.Next[i] != current)
-                {
-                    break;
-                }
-
-                update[i]!.Next[i] = current.Next[i];
-            }
-
-            while (this.levels > 1 && this.head[this.levels - 1] == null)
-            {
-                this.levels--;
-            }
-
-            this.size--;
-            this.generation++;
-            return true;
+            return false;
         }
 
-        return false;
+        current = this.head[toDelete.Levels - 1];
+        for (int i = toDelete.Levels - 1; i >= 0; i--)
+        {
+            while (current != null && current.Next[i] != null && current != toDelete)
+            {
+                current = current.Next[i];
+                update[i] = current;
+            }
+        }
+
+        if (current is null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < toDelete.Levels; i++)
+        {
+            if (update[i] is null) // if the target was the first element in line
+            {
+                this.head[i] = this.head[i]?.Next[i];
+            }
+            else
+            {
+                update[i]!.Next[i] = toDelete.Next[i];
+            }
+        }
+
+        while (this.levels > 1 && this.head[this.levels - 1] == null)
+        {
+            this.levels--;
+        }
+
+        this.size--;
+        this.generation++;
+        return true;
     }
 
     /// <summary>
@@ -333,45 +364,42 @@ public class SkipList<T> : IList<T>
         }
 
         var update = new Node?[this.levels];
-        var current = this.head[this.levels - 1];
-        var currentIndex = -1;
-
-        for (int i = this.levels - 1; i >= 0; i--)
+        var toDelete = this.head[0];
+        while (index-- > 0)
         {
-            while (current?.Next[i] != null && currentIndex < index - 1)
+            toDelete = toDelete!.Next[0];
+        }
+
+        var current = this.head[toDelete!.Levels - 1];
+        for (int i = toDelete.Levels - 1; i >= 0; i--)
+        {
+            while (current!.Next[i] != null && current.Next[i] != toDelete)
             {
                 current = current.Next[i];
-                if (i == 0)
-                {
-                    currentIndex++;
-                }
             }
 
             update[i] = current;
         }
 
-        current = current?.Next[0];
-
-        if (current != null)
+        for (int i = 0; i < toDelete.Levels; i++)
         {
-            for (int i = 0; i < this.levels; i++)
+            if (update[i] is null) // if the target was the first element in line
             {
-                if (update[i]?.Next[i] != current)
-                {
-                    break;
-                }
-
-                update[i]!.Next[i] = current.Next[i];
+                this.head[i] = this.head[i]?.Next[i];
             }
-
-            while (this.levels > 1 && this.head[this.levels - 1] == null)
+            else
             {
-                this.levels--;
+                update[i]!.Next[i] = toDelete.Next[i];
             }
-
-            this.size--;
-            this.generation++;
         }
+
+        while (this.levels > 1 && this.head[this.levels - 1] == null)
+        {
+            this.levels--;
+        }
+
+        this.size--;
+        this.generation++;
     }
 
     /// <summary>
@@ -434,6 +462,12 @@ public class SkipList<T> : IList<T>
             if (this.reseted)
             {
                 this.current = this.list.head[0];
+                if (this.current is null)
+                {
+                    this.reseted = true;
+                    return false;
+                }
+
                 this.reseted = false;
                 return true;
             }
