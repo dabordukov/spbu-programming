@@ -6,7 +6,6 @@
 namespace SkipList;
 
 using System.Collections;
-using System.Security.Principal;
 
 /// <summary>
 /// Implements a skip list.
