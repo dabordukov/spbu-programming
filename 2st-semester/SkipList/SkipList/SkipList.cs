@@ -11,10 +11,10 @@ using System.Collections;
 /// Implements a skip list.
 /// </summary>
 /// <typeparam name="T">The type of elements in the list.</typeparam>
-public class SkipList<T> : IList<T>
+public class SkipList<T>(IComparer<T> comprarer) : IList<T>
 {
     private static readonly int MaxLevels = 48;
-    private IComparer<T> comparer;
+    private IComparer<T> comparer = comprarer;
     private LevelGenerator generator = new(MaxLevels);
     private int size = 0;
     private int levels = 1;
@@ -22,24 +22,12 @@ public class SkipList<T> : IList<T>
     private uint generation = 0;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SkipList{T}"/> class.
-    /// </summary>
-    public SkipList()
-    {
-        this.comparer = Comparer<T>.Default;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SkipList{T}"/> class with a specified comparer.
+    /// Initializes a new instance of the <see cref="SkipList{T}"/> class with default comparer.
     /// </summary>
     /// <param name="comparer"> The comparer to use for comparing elements.</param>
-    public SkipList(IComparer<T> comparer)
-    : this()
+    public SkipList()
+    : this(Comparer<T>.Default)
     {
-        if (comparer is not null)
-        {
-            this.comparer = comparer;
-        }
     }
 
     /// <summary>
@@ -194,6 +182,11 @@ public class SkipList<T> : IList<T>
 
         for (int i = this.levels - 1; i >= 0; i--)
         {
+            if (current != null && this.comparer.Compare(current.Value, item) > 0)
+            {
+                current = this.head[i];
+            }
+
             while (current?.Next[i] != null && this.comparer.Compare(current.Next[i]!.Value, item) < 0)
             {
                 current = current.Next[i];
@@ -273,10 +266,7 @@ public class SkipList<T> : IList<T>
     /// </summary>
     /// <param name="index">The index at which to insert the element.</param>
     /// <param name="item">The element to insert.</param>
-    public void Insert(int index, T item)
-    {
-        throw new NotSupportedException();
-    }
+    public void Insert(int index, T item) => throw new NotSupportedException();
 
     /// <summary>
     /// Removes the first occurrence of a specific item from the list.
@@ -405,10 +395,7 @@ public class SkipList<T> : IList<T>
     /// Gets an enumerator that iterates through the list.
     /// </summary>
     /// <returns> An enumerator for the list.</returns>
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return this.GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
     private class Enumerator(SkipList<T> list) : IEnumerator<T>
     {

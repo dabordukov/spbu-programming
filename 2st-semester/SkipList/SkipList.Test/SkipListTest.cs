@@ -103,8 +103,10 @@ public class SkipListTest
     [Test]
     public void RemoveReturnsFalseForNonexistentElement()
     {
-        var list = new SkipList<int>();
-        list.Add(5);
+        var list = new SkipList<int>
+        {
+            5,
+        };
         Assert.That(list.Remove(6), Is.False);
         Assert.That(list.Count, Is.EqualTo(1));
     }
@@ -223,5 +225,22 @@ public class SkipListTest
         var list = new SkipList<int>();
         list.Add(1);
         Assert.Throws<NotSupportedException>(() => list[0] = 2);
+    }
+
+    [Test]
+    public void StressTest()
+    {
+        var n = 2000;
+        var random = new Random();
+        var list = new SkipList<int>();
+        var elements = new int[n];
+        for (int i = 0; i < n; i++)
+        {
+            elements[i] = random.Next(-50, 50);
+            list.Add(elements[i]);
+        }
+
+        Assert.That(list.Count, Is.EqualTo(n));
+        Assert.That(list.Contains(elements[random.Next(0, n)]), Is.True);
     }
 }
