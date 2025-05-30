@@ -8,7 +8,7 @@ namespace Functions;
 /// <summary>
 /// This class contains functional programming utilities.
 /// </summary>
-public class Functions
+public static class Functions
 {
     /// <summary>
     /// Maps a function over a list and returns a new list.
