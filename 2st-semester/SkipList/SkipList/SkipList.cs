@@ -352,7 +352,6 @@ public class SkipList<T>(IComparer<T> comprarer) : IList<T>
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
-        var update = new Node?[this.levels];
         var toDelete = this.head[0];
         while (index-- > 0)
         {
@@ -360,14 +359,23 @@ public class SkipList<T>(IComparer<T> comprarer) : IList<T>
         }
 
         var current = this.head[toDelete!.Levels - 1];
+        var update = new Node?[toDelete!.Levels];
         for (int i = toDelete.Levels - 1; i >= 0; i--)
         {
-            while (current!.Next[i] != null && current.Next[i] != toDelete)
+            if (current != null && this.comparer.Compare(current.Value, toDelete.Value) >= 0)
+            {
+                current = this.head[i];
+            }
+
+            while (current != null && current!.Next[i] != null && current.Next[i] != toDelete)
             {
                 current = current.Next[i];
             }
 
-            update[i] = current;
+            if (current != null && current.Next[i] == toDelete)
+            {
+                update[i] = current;
+            }
         }
 
         for (int i = 0; i < toDelete.Levels; i++)
