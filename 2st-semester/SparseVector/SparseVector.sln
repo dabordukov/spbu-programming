@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparseVector", "SparseVector\SparseVector.csproj", "{562BDB29-FF94-435C-9CCA-47E723A696C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparseVector.Test", "SparseVector.Test\SparseVector.Test.csproj", "{0CEA8E2F-6EAB-4EDB-B2BF-2553149BA260}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{562BDB29-FF94-435C-9CCA-47E723A696C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{562BDB29-FF94-435C-9CCA-47E723A696C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{562BDB29-FF94-435C-9CCA-47E723A696C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{562BDB29-FF94-435C-9CCA-47E723A696C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CEA8E2F-6EAB-4EDB-B2BF-2553149BA260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CEA8E2F-6EAB-4EDB-B2BF-2553149BA260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CEA8E2F-6EAB-4EDB-B2BF-2553149BA260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CEA8E2F-6EAB-4EDB-B2BF-2553149BA260}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
