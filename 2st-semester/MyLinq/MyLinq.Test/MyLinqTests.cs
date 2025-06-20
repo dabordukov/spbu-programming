@@ -24,4 +24,23 @@ public class MyLinqTests
 
         Assert.That(Enumerable.SequenceEqual(primes, sequence.Skip(10).Take(10)), Is.True);
     }
+
+    [Test]
+    public void Take_NegativeNumberOfElements_ReturnsEmptySequence()
+    {
+        var numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+        Assert.That(Enumerable.SequenceEqual([], numbers.Take(-4)), Is.True);
+    }
+
+    [Test]
+    public void Skip_NegativeNumberOfElements_ReturnsSourceSequence()
+    {
+        var numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+        foreach (var x in Enumerable.Skip(numbers, -2))
+        {
+            Console.WriteLine(1);
+        }
+
+        Assert.That(Enumerable.SequenceEqual(numbers, numbers.Skip(-4)), Is.True);
+    }
 }
