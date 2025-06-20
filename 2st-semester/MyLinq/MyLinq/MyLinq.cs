@@ -81,7 +81,7 @@ public static class MyLinq
         }
 
         int squareRoot = (int)Math.Sqrt(number);
-        for (int i = 3; i <= squareRoot; i += 2)
+        for (var i = 3; i <= squareRoot; i += 2)
         {
             if (number % i == 0)
             {
