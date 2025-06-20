@@ -26,6 +26,11 @@ public static class MyLinq
                 yield return current;
             }
 
+            if (current > int.MaxValue - 2)
+            {
+                yield break;
+            }
+
             current += 2;
         }
     }
