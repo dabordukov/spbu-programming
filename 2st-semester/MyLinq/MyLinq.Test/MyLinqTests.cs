@@ -36,11 +36,6 @@ public class MyLinqTests
     public void Skip_NegativeNumberOfElements_ReturnsSourceSequence()
     {
         var numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
-        foreach (var x in Enumerable.Skip(numbers, -2))
-        {
-            Console.WriteLine(1);
-        }
-
         Assert.That(Enumerable.SequenceEqual(numbers, numbers.Skip(-4)), Is.True);
     }
 }
