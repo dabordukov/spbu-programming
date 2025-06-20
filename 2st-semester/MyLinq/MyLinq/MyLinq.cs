@@ -73,8 +73,13 @@ public static class MyLinq
 
     private static bool IsPrime(int number)
     {
+        if (number % 2 == 0)
+        {
+            return false;
+        }
+
         int squareRoot = (int)Math.Sqrt(number);
-        for (int i = 2; i <= squareRoot; i++)
+        for (int i = 3; i <= squareRoot; i += 2)
         {
             if (number % i == 0)
             {
