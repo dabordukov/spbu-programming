@@ -33,10 +33,11 @@ public static class MyLinq
     /// <summary>
     /// This method takes the first n elements from the sequence.
     /// </summary>
+    /// <typeparam name="T"> The type of sequence elements.</typeparam>
     /// <param name="seq"> The original sequence.</param>
     /// <param name="n"> The number of elements to take.</param>
     /// <returns> The first n elements from the sequence.</returns>
-    public static IEnumerable<int> Take(this IEnumerable<int> seq, int n)
+    public static IEnumerable<T> Take<T>(this IEnumerable<T> seq, int n)
     {
         foreach (var next in seq)
         {
@@ -53,10 +54,11 @@ public static class MyLinq
     /// <summary>
     /// This method skips the first n elements from the sequence.
     /// </summary>
+    /// <typeparam name="T"> The type of sequence elements.</typeparam>
     /// <param name="seq"> The original sequence.</param>
     /// <param name="n"> The number of elements to skip.</param>
     /// <returns> The sequence after skipping the first n elements.</returns>
-    public static IEnumerable<int> Skip(this IEnumerable<int> seq, int n)
+    public static IEnumerable<T> Skip<T>(this IEnumerable<T> seq, int n)
     {
         foreach (var next in seq)
         {
