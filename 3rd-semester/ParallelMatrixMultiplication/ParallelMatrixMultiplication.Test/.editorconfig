@@ -3,4 +3,3 @@
 # SA1600: Elements should be documented
 dotnet_diagnostic.SA1600.severity = none
 
-dotnet_diagnostic.SA0001.severity = none
