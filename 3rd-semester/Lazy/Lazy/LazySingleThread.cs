@@ -12,7 +12,7 @@ namespace Lazy;
 /// <param name="supplier"> The delegate that is invoked to produce the lazily initialized value when it is needed.</param>
 public class LazySingleThread<T>(Func<T> supplier) : ILazy<T>
 {
-    private Func<T>? supplier = supplier;
+    private Func<T>? supplier = supplier ?? throw new ArgumentNullException();
     private bool isInitialized = false;
     private T? value = default;
 

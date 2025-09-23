@@ -13,7 +13,7 @@ namespace Lazy;
 public class LazyMultiThread<T>(Func<T> supplier) : ILazy<T>
 {
     private readonly Lock @lock = new();
-    private Func<T>? supplier = supplier;
+    private Func<T>? supplier = supplier ?? throw new ArgumentNullException();
     private bool isInitialized = false;
     private T? value = default;
 
