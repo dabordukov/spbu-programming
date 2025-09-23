@@ -7,52 +7,80 @@ namespace Lazy.Test;
 
 public class LazyTests
 {
-    private const int N = 1000;
+    private static object[] lazyImplementationsInt =
+    [
+            new Func<Func<int>, ILazy<int>>(supplier => new LazySingleThread<int>(supplier)),
+            new Func<Func<int>, ILazy<int>>(supplier => new LazyMultiThread<int>(supplier)),
+    ];
 
-    private static (ILazy<int>, int)[] lazy =
+    private static object[] lazyImplementationsObject =
+    [
+            new Func<Func<object>, ILazy<object>>(supplier => new LazySingleThread<object>(supplier)),
+            new Func<Func<object>, ILazy<object>>(supplier => new LazyMultiThread<object>(supplier)),
+    ];
+
+    [TestCaseSource(nameof(lazyImplementationsInt))]
+    public void Get_ReturnsSupplierValue(Func<Func<int>, ILazy<int>> lazyFunction)
     {
-        (new LazySingleThread<int>(Supplier), 1),
-        (new LazyMultiThread<int>(Supplier), Environment.ProcessorCount),
-    };
+        var lazy = lazyFunction(() => 123);
+        Assert.That(lazy.Get(), Is.EqualTo(123));
+    }
 
-    [TestCaseSource(nameof(lazy))]
-    public void Lazy_ManyRequest_ReturnsValue((ILazy<int> Lazy, int NumberOfThreads) args)
+    [TestCaseSource(nameof(lazyImplementationsInt))]
+    public void Supplier_IsCalledOnlyOnce(Func<Func<int>, ILazy<int>> lazyFunction)
     {
-        var results = new int[args.NumberOfThreads];
-        var threads = new Thread[args.NumberOfThreads];
-        for (int i = 0; i < args.NumberOfThreads; i++)
+        int callCount = 0;
+        var lazy = lazyFunction(() =>
         {
-            var index = i;
-            threads[i] = new Thread(() => Simulate(results, index, args.Lazy));
-        }
+            callCount++;
+            return 99;
+        });
 
-        foreach (var thread in threads)
-        {
-            thread.Start();
-        }
+        var first = lazy.Get();
+        var second = lazy.Get();
 
-        foreach (var thread in threads)
+        Assert.That(first, Is.EqualTo(99));
+        Assert.That(second, Is.EqualTo(99));
+        Assert.That(callCount, Is.EqualTo(1));
+    }
+
+    [TestCaseSource(nameof(lazyImplementationsInt))]
+    public void Constructor_NullSupplier_ThrowsArgumentNullException(Func<Func<int>, ILazy<int>> lazyFunction)
+    {
+        Assert.Throws<ArgumentNullException>(() => lazyFunction(null!));
+    }
+
+    [Test]
+    public void LazyMultiThread_IsThreadSafe_SupplierCalledOnce()
+    {
+        int callCount = 0;
+        var lazy = new LazyMultiThread<int>(() =>
         {
-            thread.Join();
-        }
+            Interlocked.Increment(ref callCount);
+            Thread.Sleep(50);
+            return 1234;
+        });
+
+        int[] results = new int[10];
+        Parallel.For(0, 10, i =>
+        {
+            results[i] = lazy.Get();
+        });
 
         foreach (var result in results)
         {
-            Assert.That(result, Is.EqualTo(N));
+            Assert.That(result, Is.EqualTo(1234));
         }
+
+        Assert.That(callCount, Is.EqualTo(1));
     }
 
-    private static void Simulate(int[] results, int index, ILazy<int> lazy)
+    [TestCaseSource(nameof(lazyImplementationsObject))]
+    public void Get_ReturnsSameReferenceOnMultipleCalls(Func<Func<object>, ILazy<object>> lazyFunction)
     {
-        for (int i = 0; i < N; i++)
-        {
-            results[index] += lazy.Get();
-        }
-    }
-
-    private static int Supplier()
-    {
-        Thread.Sleep(50);
-        return 1;
+        var lazy = lazyFunction(() => new object());
+        var first = lazy.Get();
+        var second = lazy.Get();
+        Assert.That(first, Is.EqualTo(second));
     }
 }
