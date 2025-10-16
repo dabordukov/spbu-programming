@@ -1,0 +1,189 @@
+// <copyright file="FTPServer.cs" company="dabordukov">
+// Copyright (c) dabordukov. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+
+namespace SimpleFTPServer;
+
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using Logging;
+
+/// <summary>
+/// FTPServer class.
+/// </summary>
+public class FTPServer
+{
+    private readonly IPAddress ip;
+    private readonly int port;
+    private readonly TcpListener tcpListener;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FTPServer"/> class.
+    /// </summary>
+    /// <param name="ip"> IP address to listen on. </param>
+    /// <param name="port"> Port to listen on. </param>
+    /// <param name="path"> Path to the directory to serve files from. </param>
+    public FTPServer(string ip, int port)
+    {
+        this.ip = IPAddress.Parse(ip);
+        this.port = port;
+        this.tcpListener = new TcpListener(this.ip, this.port);
+    }
+
+    /// <summary>
+    /// Starts the FTP server.
+    /// </summary>
+    /// <param name="token"> Cancellation token. </param>
+    /// <returns> A <see cref="Task"/> representing the asynchronous operation of the server. </returns>
+    public async Task StartAsync(CancellationToken token = default)
+    {
+        try
+        {
+            this.tcpListener.Start();
+            Logging.Info($"Server started on {this.tcpListener.Server.LocalEndPoint}");
+            while (!token.IsCancellationRequested)
+            {
+                var tcpClient = await this.tcpListener.AcceptTcpClientAsync(token);
+                _ = Task.Run(new TcpConnectionProcessor(tcpClient).ProcessConnection, token);
+            }
+        }
+        catch (Exception e)
+        {
+            Logging.Error($"New exception: {e.Message}");
+            throw new AggregateException(e);
+        }
+        finally
+        {
+            this.tcpListener.Stop();
+            Logging.Info("Server stopped");
+        }
+    }
+
+    private class TcpConnectionProcessor
+    {
+        private const long BufferSize = 512;
+        private const long ErrorCode = -1;
+        private readonly TcpClient tcpClient;
+        private readonly NetworkStream stream;
+        private readonly StreamReader reader;
+        private readonly BinaryWriter writer;
+        private readonly string endpoint;
+
+        public TcpConnectionProcessor(TcpClient tcpClient)
+        {
+            this.tcpClient = tcpClient;
+            this.stream = tcpClient.GetStream();
+            this.reader = new StreamReader(this.stream);
+            this.writer = new BinaryWriter(this.stream);
+            var remoteEndPoint = tcpClient.Client.RemoteEndPoint;
+            string? endpointString;
+            if (remoteEndPoint is null || (endpointString = remoteEndPoint.ToString()) is null)
+            {
+                throw new ArgumentNullException("tcpClient.Client.RemoteEndPoint", "Remote endpoint is not available");
+            }
+
+            this.endpoint = endpointString;
+        }
+
+        public async Task ProcessConnection()
+        {
+            Logging.Info("CONNECTED", this.endpoint);
+            while (true)
+            {
+                var read = this.reader.ReadLineAsync(new CancellationTokenSource(TimeSpan.FromSeconds(60)).Token);
+                var line = await read;
+                if (line is null)
+                {
+                    break;
+                }
+
+                var request = line.Split(' ', 2);
+                if (request.Length != 2)
+                {
+                    this.SendError("Invalid request");
+                }
+
+                if (request[0] == "1")
+                {
+                    Logging.Info($"LIST {request[1]}", this.endpoint);
+                    this.ListDirectory(request[1]);
+                }
+                else if (request[0] == "2")
+                {
+                    Logging.Info($"GET {request[1]}", this.endpoint);
+                    this.SendFile(request[1]);
+                }
+                else
+                {
+                    this.SendError("Invalid request");
+                }
+            }
+
+            Logging.Info("DISCONNECTED", this.endpoint);
+            this.tcpClient.Close();
+        }
+
+        private void ListDirectory(string path)
+        {
+            DirectoryInfo dirInfo = new(Path.Combine(Directory.GetCurrentDirectory(), path));
+            var list = new List<(string, bool)>();
+            foreach (var dir in dirInfo.GetDirectories("*.*"))
+            {
+                list.Add((dir.Name, true));
+            }
+
+            foreach (var file in dirInfo.GetFiles("*.*"))
+            {
+                list.Add((file.Name, false));
+            }
+
+            this.writer.Write((long)list.Count);
+            foreach (var name in list)
+            {
+                this.writer.Write(name.Item1);
+                this.writer.Write((byte)0);
+                this.writer.Write(name.Item2);
+            }
+
+            this.writer.Flush();
+        }
+
+        private void SendFile(string path)
+        {
+            FileInfo file = new(Path.Combine(Directory.GetCurrentDirectory(), path));
+            if (!file.Exists)
+            {
+                this.SendError("File not exists");
+                return;
+            }
+
+            this.writer.Write(file.Length);
+            using FileStream fstream = new(file.FullName, FileMode.Open);
+
+            var buffer = new byte[BufferSize];
+            var bytesRead = 0;
+            while ((bytesRead = fstream.Read(buffer)) == BufferSize)
+            {
+                this.writer.Write(buffer);
+            }
+
+            if (bytesRead > 0)
+            {
+                this.writer.Write(new ReadOnlySpan<byte>(buffer, 0, bytesRead));
+            }
+
+            this.writer.Flush();
+        }
+
+        private void SendError(string message)
+        {
+            this.writer.Write(ErrorCode);
+            var data = Encoding.UTF8.GetBytes(message);
+            this.writer.Write(data.Length);
+            this.writer.Write(data);
+            this.writer.Flush();
+        }
+    }
+}
