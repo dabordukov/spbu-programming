@@ -62,6 +62,7 @@ public class FTPServer
                     }
                 },
                 token);
+                this.activeTasks.Add(task);
             }
 
             Task.WaitAll(this.activeTasks, token);
