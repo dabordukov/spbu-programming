@@ -202,11 +202,10 @@ public class FTPServer
                 return;
             }
 
-            this.writer.Write(file.Length);
-
             try
             {
                 using FileStream fstream = new(file.FullName, FileMode.Open);
+                this.writer.Write(file.Length);
 
                 var buffer = new byte[BufferSize];
                 var bytesRead = 0;
