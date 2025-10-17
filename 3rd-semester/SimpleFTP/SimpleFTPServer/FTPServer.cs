@@ -81,7 +81,7 @@ public class FTPServer
 
     private class TcpConnectionProcessor : IDisposable
     {
-        private const long BufferSize = 512;
+        private const int BufferSize = 4096;
         private readonly TcpClient tcpClient;
         private readonly NetworkStream stream;
         private readonly StreamReader reader;
