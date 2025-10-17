@@ -64,7 +64,7 @@ public class FTPServer
                 token);
             }
 
-            Task.WaitAll(this.activeTasks);
+            Task.WaitAll(this.activeTasks, token);
         }
         catch (Exception e)
         {
