@@ -20,6 +20,7 @@ public class FTPServer
     private readonly IPAddress ip;
     private readonly int port;
     private readonly TcpListener tcpListener;
+    private readonly List<Task> activeTasks = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FTPServer"/> class.
@@ -47,13 +48,27 @@ public class FTPServer
             while (!token.IsCancellationRequested)
             {
                 var tcpClient = await this.tcpListener.AcceptTcpClientAsync(token);
-                _ = Task.Run(new TcpConnectionProcessor(tcpClient).ProcessConnection, token);
+                using var task = Task.Run(
+                async () =>
+                {
+                    try
+                    {
+                        await new TcpConnectionProcessor(tcpClient).ProcessConnection();
+                    }
+                    catch (Exception e)
+                    {
+                        Logging.Error($"New exception: {e.Message}");
+                    }
+                },
+                token);
             }
+
+            Task.WaitAll(this.activeTasks);
         }
         catch (Exception e)
         {
             Logging.Error($"New exception: {e.Message}");
-            throw new AggregateException(e);
+            throw;
         }
         finally
         {
