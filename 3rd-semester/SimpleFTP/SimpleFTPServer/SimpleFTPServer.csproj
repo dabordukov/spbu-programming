@@ -21,4 +21,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Logging\Logging.csproj" />
   </ItemGroup>
+
+  <PropertyGroup>
+   <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
 </Project>
