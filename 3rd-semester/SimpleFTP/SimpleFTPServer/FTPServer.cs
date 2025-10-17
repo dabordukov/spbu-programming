@@ -93,8 +93,8 @@ public class FTPServer
             Logging.Info("CONNECTED", this.endpoint);
             while (true)
             {
-                var read = this.reader.ReadLineAsync(new CancellationTokenSource(TimeSpan.FromSeconds(ClientTimeoutSeconds)).Token);
-                var line = await read;
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(ClientTimeoutSeconds));
+                var line = await this.reader.ReadLineAsync(cts.Token);
                 if (line is null)
                 {
                     break;
