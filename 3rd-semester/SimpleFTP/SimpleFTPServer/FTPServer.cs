@@ -176,7 +176,6 @@ public class FTPServer
                 foreach (var name in list)
                 {
                     this.writer.Write(name.Item1);
-                    this.writer.Write((byte)0);
                     this.writer.Write(name.Item2);
                 }
 
