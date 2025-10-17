@@ -44,6 +44,6 @@ public static class Logging
     /// <param name="tags"> Optional tags to include in the log. </param>
     public static void Error(string message, params string[] tags)
     {
-        Log(message, "Error", tags);
+        Log(message, "ERROR", tags);
     }
 }
