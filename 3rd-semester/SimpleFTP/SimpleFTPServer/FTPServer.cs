@@ -152,26 +152,45 @@ public class FTPServer
         private void ListDirectory(string path)
         {
             DirectoryInfo dirInfo = new(Path.Combine(Directory.GetCurrentDirectory(), path));
-            var list = new List<(string, bool)>();
-            foreach (var dir in dirInfo.GetDirectories("*.*"))
+            if (!dirInfo.Exists)
             {
-                list.Add((dir.Name, true));
+                this.SendError("Directory not exists");
+                return;
             }
 
-            foreach (var file in dirInfo.GetFiles("*.*"))
+            try
             {
-                list.Add((file.Name, false));
-            }
+                var list = new List<(string, bool)>();
+                foreach (var dir in dirInfo.GetDirectories("*.*"))
+                {
+                    list.Add((dir.Name, true));
+                }
 
-            this.writer.Write((long)list.Count);
-            foreach (var name in list)
+                foreach (var file in dirInfo.GetFiles("*.*"))
+                {
+                    list.Add((file.Name, false));
+                }
+
+                this.writer.Write((long)list.Count);
+                foreach (var name in list)
+                {
+                    this.writer.Write(name.Item1);
+                    this.writer.Write((byte)0);
+                    this.writer.Write(name.Item2);
+                }
+
+                this.writer.Flush();
+            }
+            catch (Exception e)
             {
-                this.writer.Write(name.Item1);
-                this.writer.Write((byte)0);
-                this.writer.Write(name.Item2);
-            }
+                if (e is UnauthorizedAccessException || e is System.Security.SecurityException)
+                {
+                    this.SendError("Unauthorized");
+                    return;
+                }
 
-            this.writer.Flush();
+                throw;
+            }
         }
 
         private void SendFile(string path)
@@ -184,21 +203,29 @@ public class FTPServer
             }
 
             this.writer.Write(file.Length);
-            using FileStream fstream = new(file.FullName, FileMode.Open);
 
-            var buffer = new byte[BufferSize];
-            var bytesRead = 0;
-            while ((bytesRead = fstream.Read(buffer)) == BufferSize)
+            try
             {
-                this.writer.Write(buffer);
-            }
+                using FileStream fstream = new(file.FullName, FileMode.Open);
 
-            if (bytesRead > 0)
+                var buffer = new byte[BufferSize];
+                var bytesRead = 0;
+                while ((bytesRead = fstream.Read(buffer)) == BufferSize)
+                {
+                    this.writer.Write(buffer);
+                }
+
+                if (bytesRead > 0)
+                {
+                    this.writer.Write(new ReadOnlySpan<byte>(buffer, 0, bytesRead));
+                }
+
+                this.writer.Flush();
+            }
+            catch (UnauthorizedAccessException)
             {
-                this.writer.Write(new ReadOnlySpan<byte>(buffer, 0, bytesRead));
+                this.SendError("Unauthorized");
             }
-
-            this.writer.Flush();
         }
 
         private void SendError(string message)
