@@ -53,7 +53,8 @@ public class FTPServer
                 {
                     try
                     {
-                        await new TcpConnectionProcessor(tcpClient).ProcessConnection();
+                        using var connection = new TcpConnectionProcessor(tcpClient);
+                        await connection.ProcessConnection();
                     }
                     catch (Exception e)
                     {
@@ -77,7 +78,7 @@ public class FTPServer
         }
     }
 
-    private class TcpConnectionProcessor
+    private class TcpConnectionProcessor : IDisposable
     {
         private const long BufferSize = 512;
         private readonly TcpClient tcpClient;
@@ -100,6 +101,14 @@ public class FTPServer
             }
 
             this.endpoint = endpointString;
+        }
+
+        public void Dispose()
+        {
+            this.reader.Dispose();
+            this.writer.Dispose();
+            this.stream.Dispose();
+            this.tcpClient.Dispose();
         }
 
         public async Task ProcessConnection()
