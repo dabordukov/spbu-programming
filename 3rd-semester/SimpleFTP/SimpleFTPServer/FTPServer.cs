@@ -15,6 +15,8 @@ using Logging;
 /// </summary>
 public class FTPServer
 {
+    private const int ClientTimeoutSeconds = 60;
+    private const long ErrorCode = -1;
     private readonly IPAddress ip;
     private readonly int port;
     private readonly TcpListener tcpListener;
@@ -64,7 +66,6 @@ public class FTPServer
     private class TcpConnectionProcessor
     {
         private const long BufferSize = 512;
-        private const long ErrorCode = -1;
         private readonly TcpClient tcpClient;
         private readonly NetworkStream stream;
         private readonly StreamReader reader;
@@ -92,7 +93,7 @@ public class FTPServer
             Logging.Info("CONNECTED", this.endpoint);
             while (true)
             {
-                var read = this.reader.ReadLineAsync(new CancellationTokenSource(TimeSpan.FromSeconds(60)).Token);
+                var read = this.reader.ReadLineAsync(new CancellationTokenSource(TimeSpan.FromSeconds(ClientTimeoutSeconds)).Token);
                 var line = await read;
                 if (line is null)
                 {
