@@ -13,7 +13,7 @@ using Logging;
 /// <summary>
 /// FTPServer class.
 /// </summary>
-public class FTPServer
+public class FTPServer : IDisposable
 {
     private const int ClientTimeoutSeconds = 60;
     private const long ErrorCode = -1;
@@ -32,6 +32,14 @@ public class FTPServer
         this.ip = IPAddress.Parse(ip);
         this.port = port;
         this.tcpListener = new TcpListener(this.ip, this.port);
+    }
+
+    /// <summary>
+    /// Disposes the FTPServer.
+    /// </summary>
+    public void Dispose()
+    {
+        this.tcpListener.Dispose();
     }
 
     /// <summary>

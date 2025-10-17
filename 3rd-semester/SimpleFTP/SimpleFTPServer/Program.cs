@@ -34,7 +34,7 @@ if (args.Length > 1)
     }
 }
 
-var ftp = new FTPServer(address, port);
+using var ftp = new FTPServer(address, port);
 await ftp.StartAsync();
 
 return 0;
