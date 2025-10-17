@@ -26,7 +26,6 @@ public class FTPServer
     /// </summary>
     /// <param name="ip"> IP address to listen on. </param>
     /// <param name="port"> Port to listen on. </param>
-    /// <param name="path"> Path to the directory to serve files from. </param>
     public FTPServer(string ip, int port)
     {
         this.ip = IPAddress.Parse(ip);
