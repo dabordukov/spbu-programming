@@ -21,17 +21,17 @@ if (args.Contains("--help") || args.Contains("-h"))
 string address = "0.0.0.0";
 int port = 2222;
 
-if (args.Length >= 1)
+if (args.Length > 0)
+{
+    address = args[0];
+}
+
+if (args.Length > 1)
 {
     if (!int.TryParse(args[1], out port))
     {
         Console.WriteLine("Invalid port number");
     }
-}
-
-if (args.Length >= 2)
-{
-    address = args[0];
 }
 
 var ftp = new FTPServer(address, port);
