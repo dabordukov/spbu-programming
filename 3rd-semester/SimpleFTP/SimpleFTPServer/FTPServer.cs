@@ -230,9 +230,7 @@ public class FTPServer
         private void SendError(string message)
         {
             this.writer.Write(ErrorCode);
-            var data = Encoding.UTF8.GetBytes(message);
-            this.writer.Write(data.Length);
-            this.writer.Write(data);
+            this.writer.Write(message);
             this.writer.Flush();
         }
     }
