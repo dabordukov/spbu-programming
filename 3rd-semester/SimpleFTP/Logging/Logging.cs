@@ -10,7 +10,8 @@ namespace Logging;
 /// </summary>
 public static class Logging
 {
-    private static readonly Lock @lock = new Lock();
+    private static readonly Lock Lock = new();
+
     /// <summary>
     /// Logs a message to the console with a timestamp and optional tags.
     /// </summary>
@@ -19,7 +20,7 @@ public static class Logging
     /// <param name="tags"> Optional tags to include in the log. </param>
     public static void Log(string message, string type, params string[] tags)
     {
-        lock (@lock)
+        lock (Lock)
         {
             Console.Write($"[{type}][{DateTime.Now}]");
             foreach (var tag in tags)
