@@ -126,7 +126,18 @@ public class FTPServer : IDisposable
             while (true)
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(ClientTimeoutSeconds));
-                var line = await this.reader.ReadLineAsync(cts.Token);
+                string? line;
+                try
+                {
+                    line = await this.reader.ReadLineAsync(cts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    Logging.Info("TIMEOUT", this.endpoint);
+                    this.SendError("Timeout");
+                    break;
+                }
+
                 if (line is null)
                 {
                     break;
