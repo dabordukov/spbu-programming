@@ -13,25 +13,24 @@ using Logging;
 /// <summary>
 /// FTPServer class.
 /// </summary>
-public class FTPServer : IDisposable
+public class FTPServer(string ip, int port, Stream stream) : IDisposable
 {
     private const int ClientTimeoutSeconds = 60;
     private const long ErrorCode = -1;
-    private readonly IPAddress ip;
-    private readonly int port;
-    private readonly TcpListener tcpListener;
+    private readonly TcpListener tcpListener = new(IPAddress.Parse(ip), port);
+    private readonly StreamWriter loggerStream = new(stream);
     private readonly List<Task> activeTasks = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FTPServer"/> class.
+    /// Sets logger stream to console stdout.
     /// </summary>
     /// <param name="ip"> IP address to listen on. </param>
     /// <param name="port"> Port to listen on. </param>
     public FTPServer(string ip, int port)
+    : this(ip, port, Console.OpenStandardOutput())
     {
-        this.ip = IPAddress.Parse(ip);
-        this.port = port;
-        this.tcpListener = new TcpListener(this.ip, this.port);
+        this.loggerStream.AutoFlush = true;
     }
 
     /// <summary>
@@ -52,7 +51,7 @@ public class FTPServer : IDisposable
         try
         {
             this.tcpListener.Start();
-            Logging.Info($"Server started on {this.tcpListener.Server.LocalEndPoint}");
+            Logging.Info(this.loggerStream, $"Server started on {this.tcpListener.Server.LocalEndPoint}");
             while (!token.IsCancellationRequested)
             {
                 var tcpClient = await this.tcpListener.AcceptTcpClientAsync(token);
@@ -61,12 +60,12 @@ public class FTPServer : IDisposable
                 {
                     try
                     {
-                        using var connection = new TcpConnectionProcessor(tcpClient);
+                        using var connection = new TcpConnectionProcessor(this.loggerStream, tcpClient);
                         await connection.ProcessConnection();
                     }
                     catch (Exception e)
                     {
-                        Logging.Error($"New exception: {e.Message}");
+                        Logging.Error(this.loggerStream, $"New exception: {e.Message}");
                     }
                 },
                 token);
@@ -77,13 +76,13 @@ public class FTPServer : IDisposable
         }
         catch (Exception e)
         {
-            Logging.Error($"New exception: {e.Message}");
+            Logging.Error(this.loggerStream, $"New exception: {e.Message}");
             throw;
         }
         finally
         {
             this.tcpListener.Stop();
-            Logging.Info("Server stopped");
+            Logging.Info(this.loggerStream, "Server stopped");
         }
     }
 
@@ -95,8 +94,9 @@ public class FTPServer : IDisposable
         private readonly StreamReader reader;
         private readonly BinaryWriter writer;
         private readonly string endpoint;
+        private readonly StreamWriter loggerStream;
 
-        public TcpConnectionProcessor(TcpClient tcpClient)
+        public TcpConnectionProcessor(StreamWriter stream, TcpClient tcpClient)
         {
             this.tcpClient = tcpClient;
             this.stream = tcpClient.GetStream();
@@ -110,6 +110,8 @@ public class FTPServer : IDisposable
             }
 
             this.endpoint = endpointString;
+
+            this.loggerStream = stream;
         }
 
         public void Dispose()
@@ -122,7 +124,7 @@ public class FTPServer : IDisposable
 
         public async Task ProcessConnection()
         {
-            Logging.Info("CONNECTED", this.endpoint);
+            Logging.Info(this.loggerStream, "CONNECTED", this.endpoint);
             while (true)
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(ClientTimeoutSeconds));
@@ -133,7 +135,7 @@ public class FTPServer : IDisposable
                 }
                 catch (OperationCanceledException)
                 {
-                    Logging.Info("TIMEOUT", this.endpoint);
+                    Logging.Info(this.loggerStream, "TIMEOUT", this.endpoint);
                     this.SendError("Timeout");
                     break;
                 }
@@ -151,12 +153,12 @@ public class FTPServer : IDisposable
 
                 if (request[0] == "1")
                 {
-                    Logging.Info($"LIST {request[1]}", this.endpoint);
+                    Logging.Info(this.loggerStream, $"LIST {request[1]}", this.endpoint);
                     this.ListDirectory(request[1]);
                 }
                 else if (request[0] == "2")
                 {
-                    Logging.Info($"GET {request[1]}", this.endpoint);
+                    Logging.Info(this.loggerStream, $"GET {request[1]}", this.endpoint);
                     this.SendFile(request[1]);
                 }
                 else
@@ -165,7 +167,7 @@ public class FTPServer : IDisposable
                 }
             }
 
-            Logging.Info("DISCONNECTED", this.endpoint);
+            Logging.Info(this.loggerStream, "DISCONNECTED", this.endpoint);
             this.tcpClient.Close();
         }
 
