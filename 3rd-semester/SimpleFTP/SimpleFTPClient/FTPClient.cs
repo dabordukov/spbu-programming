@@ -5,9 +5,7 @@
 
 namespace SimpleFTPClient;
 
-using System.Net.Quic;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 
 /// <summary>
 /// FTPClient class.
