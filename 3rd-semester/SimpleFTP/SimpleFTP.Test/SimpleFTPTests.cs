@@ -28,10 +28,10 @@ public class SimpleFTPTests
         File.WriteAllText(Path.Combine(this.testDir, "dir/b.txt"), "BBB");
 
         this.cts = new CancellationTokenSource();
-        this.server = new FTPServer(Host, Port, 10);
+        this.server = new FTPServer(Host, Port, 15);
         _ = Task.Run(() => this.server.StartAsync(this.cts.Token));
 
-        await Task.Delay(300);
+        await Task.Delay(3000);
     }
 
     [TearDown]
@@ -100,7 +100,7 @@ public class SimpleFTPTests
     {
         using var tcpClient = new TcpClient();
         tcpClient.Connect(Host, Port);
-        Thread.Sleep(TimeSpan.FromSeconds(15));
+        Thread.Sleep(TimeSpan.FromSeconds(20));
 
         var stream = tcpClient.GetStream();
         var reader = new BinaryReader(stream);
