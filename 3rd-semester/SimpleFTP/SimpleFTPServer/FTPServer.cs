@@ -13,13 +13,13 @@ using Logging;
 /// <summary>
 /// FTPServer class.
 /// </summary>
-public class FTPServer(string ip, int port, Stream stream) : IDisposable
+public class FTPServer(string ip, int port, Stream stream, int clientTimeoutSeconds = 60) : IDisposable
 {
-    private const int ClientTimeoutSeconds = 60;
     private const long ErrorCode = -1;
     private readonly TcpListener tcpListener = new(IPAddress.Parse(ip), port);
     private readonly StreamWriter loggerStream = new(stream);
     private readonly List<Task> activeTasks = [];
+    private int clientTimeoutSeconds = clientTimeoutSeconds;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FTPServer"/> class.
@@ -27,8 +27,9 @@ public class FTPServer(string ip, int port, Stream stream) : IDisposable
     /// </summary>
     /// <param name="ip"> IP address to listen on. </param>
     /// <param name="port"> Port to listen on. </param>
-    public FTPServer(string ip, int port)
-    : this(ip, port, Console.OpenStandardOutput())
+    /// <param name="clientTimeoutSeconds"> Client timeout in seconds. </param>
+    public FTPServer(string ip, int port, int clientTimeoutSeconds = 60)
+    : this(ip, port, Console.OpenStandardOutput(), clientTimeoutSeconds)
     {
         this.loggerStream.AutoFlush = true;
     }
@@ -60,7 +61,7 @@ public class FTPServer(string ip, int port, Stream stream) : IDisposable
                 {
                     try
                     {
-                        using var connection = new TcpConnectionProcessor(this.loggerStream, tcpClient);
+                        using var connection = new TcpConnectionProcessor(this.loggerStream, tcpClient, this.clientTimeoutSeconds);
                         await connection.ProcessConnection();
                     }
                     catch (Exception e)
@@ -95,10 +96,12 @@ public class FTPServer(string ip, int port, Stream stream) : IDisposable
         private readonly BinaryWriter writer;
         private readonly string endpoint;
         private readonly StreamWriter loggerStream;
+        private readonly int clientTimeoutSeconds;
 
-        public TcpConnectionProcessor(StreamWriter stream, TcpClient tcpClient)
+        public TcpConnectionProcessor(StreamWriter stream, TcpClient tcpClient, int clientTimeoutSeconds)
         {
             this.tcpClient = tcpClient;
+            this.clientTimeoutSeconds = clientTimeoutSeconds;
             this.stream = tcpClient.GetStream();
             this.reader = new StreamReader(this.stream);
             this.writer = new BinaryWriter(this.stream);
@@ -127,7 +130,7 @@ public class FTPServer(string ip, int port, Stream stream) : IDisposable
             Logging.Info(this.loggerStream, "CONNECTED", this.endpoint);
             while (true)
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(ClientTimeoutSeconds));
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.clientTimeoutSeconds));
                 string? line;
                 try
                 {
