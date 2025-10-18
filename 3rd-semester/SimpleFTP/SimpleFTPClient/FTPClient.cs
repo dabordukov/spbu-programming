@@ -27,7 +27,7 @@ public class FTPClient : IDisposable
     /// <param name="ip"> IP address of the FTP server. </param>
     /// <param name="port"> Port of the FTP server. </param>
     /// <param name="token"> Cancellation token. </param>
-    public FTPClient(string ip, int port, CancellationToken token = default)
+    public FTPClient(string ip, int port)
     {
         this.tcpClient.Connect(ip, port);
         this.stream = this.tcpClient.GetStream();
