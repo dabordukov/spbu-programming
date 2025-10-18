@@ -7,7 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleFTP", "SimpleFTPServe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logging", "Logging\Logging.csproj", "{97FDBAB6-591F-4008-9AC2-C8525171A032}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleFTPClient", "SimpleFTPClient\SimpleFTPClient.csproj", "{9A8A923D-C872-450C-86AB-7BB889A48844}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleFTPServer.CLI", "SimpleFTPServer.CLI\SimpleFTPServer.CLI.csproj", "{29F4FCDD-B501-455C-987B-83608218C9AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleFTPClient.CLI", "SimpleFTPClient.CLI\SimpleFTPClient.CLI.csproj", "{86398971-CF54-4AEA-9451-7D7093846E66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,9 +30,17 @@ Global
 		{97FDBAB6-591F-4008-9AC2-C8525171A032}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97FDBAB6-591F-4008-9AC2-C8525171A032}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97FDBAB6-591F-4008-9AC2-C8525171A032}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A8A923D-C872-450C-86AB-7BB889A48844}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A8A923D-C872-450C-86AB-7BB889A48844}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A8A923D-C872-450C-86AB-7BB889A48844}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A8A923D-C872-450C-86AB-7BB889A48844}.Release|Any CPU.Build.0 = Release|Any CPU
 		{29F4FCDD-B501-455C-987B-83608218C9AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{29F4FCDD-B501-455C-987B-83608218C9AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29F4FCDD-B501-455C-987B-83608218C9AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29F4FCDD-B501-455C-987B-83608218C9AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86398971-CF54-4AEA-9451-7D7093846E66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86398971-CF54-4AEA-9451-7D7093846E66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86398971-CF54-4AEA-9451-7D7093846E66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86398971-CF54-4AEA-9451-7D7093846E66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
