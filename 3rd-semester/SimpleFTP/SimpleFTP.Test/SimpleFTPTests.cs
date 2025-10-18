@@ -12,7 +12,7 @@ using SimpleFTPServer;
 public class SimpleFTPTests
 {
     private const string Host = "127.0.0.1";
-    private const int Port = 22222;
+    private const int Port = 2456;
     private string testDir = null!;
     private FTPServer? server;
     private CancellationTokenSource cts = null!;
@@ -22,16 +22,16 @@ public class SimpleFTPTests
     {
         this.testDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(this.testDir);
-        Directory.SetCurrentDirectory(this.testDir);
-        File.WriteAllText("a.txt", "AAA");
-        Directory.CreateDirectory("dir");
-        File.WriteAllText("dir/b.txt", "BBB");
+
+        File.WriteAllText(Path.Combine(this.testDir, "a.txt"), "AAA");
+        Directory.CreateDirectory(Path.Combine(this.testDir, "dir"));
+        File.WriteAllText(Path.Combine(this.testDir, "dir/b.txt"), "BBB");
 
         this.cts = new CancellationTokenSource();
-        this.server = new FTPServer(Host, Port, 15);
+        this.server = new FTPServer(Host, Port, 10);
         _ = Task.Run(() => this.server.StartAsync(this.cts.Token));
 
-        await Task.Delay(3000);
+        await Task.Delay(300);
     }
 
     [TearDown]
@@ -51,7 +51,7 @@ public class SimpleFTPTests
     public void List_ShouldReturnFilesAndFolders()
     {
         using var client = new FTPClient(Host, Port);
-        var (error, list) = client.List(".");
+        var (error, list) = client.List(this.testDir);
 
         Assert.That(error, Is.Null);
         Assert.That(list, Is.Not.Null);
@@ -63,7 +63,7 @@ public class SimpleFTPTests
     public void List_ShouldReturnError_ForMissingDirectory()
     {
         using var client = new FTPClient(Host, Port);
-        var (error, list) = client.List("does_not_exist");
+        var (error, list) = client.List(Path.Combine(this.testDir, "does_not_exist"));
 
         Assert.That(error, Is.Not.Null);
         Assert.That(error, Does.Contain("Directory not exists"));
@@ -74,8 +74,8 @@ public class SimpleFTPTests
     public void Get_ShouldDownloadFileCorrectly()
     {
         using var client = new FTPClient(Host, Port);
-        var saveTo = "download.txt";
-        var (error, size) = client.Get("a.txt", saveTo);
+        var saveTo = Path.Combine(this.testDir, "download.txt");
+        var (error, size) = client.Get(Path.Combine(this.testDir, "a.txt"), saveTo);
 
         Assert.That(error, Is.Null);
         Assert.That(File.Exists(saveTo));
@@ -87,7 +87,7 @@ public class SimpleFTPTests
     public void Get_ShouldReturnError_WhenFileDoesNotExist()
     {
         using var client = new FTPClient(Host, Port);
-        var saveTo = "download.txt";
+        var saveTo = Path.Combine(this.testDir, "download.txt");
         var (error, size) = client.Get("missing.txt", saveTo);
 
         Assert.That(error, Is.Not.Null);
@@ -100,7 +100,7 @@ public class SimpleFTPTests
     {
         using var tcpClient = new TcpClient();
         tcpClient.Connect(Host, Port);
-        Thread.Sleep(TimeSpan.FromSeconds(20));
+        Thread.Sleep(TimeSpan.FromSeconds(15));
 
         var stream = tcpClient.GetStream();
         var reader = new BinaryReader(stream);
