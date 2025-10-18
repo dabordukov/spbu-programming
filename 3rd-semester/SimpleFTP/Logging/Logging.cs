@@ -29,7 +29,7 @@ public static class Logging
                 stream.Write($"[{tag}]");
             }
 
-            stream.WriteLine($"  {message}");
+            stream.WriteLine($" {message}");
         }
     }
 
