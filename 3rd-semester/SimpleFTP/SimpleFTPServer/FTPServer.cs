@@ -56,7 +56,7 @@ public class FTPServer : IDisposable
             while (!token.IsCancellationRequested)
             {
                 var tcpClient = await this.tcpListener.AcceptTcpClientAsync(token);
-                using var task = Task.Run(
+                var task = Task.Run(
                 async () =>
                 {
                     try
