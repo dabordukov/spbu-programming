@@ -52,7 +52,15 @@ public class FTPClient : IDisposable
     /// <returns> A tuple containing an error message if any, and the list of files. </returns>
     public (string? Error, List<(string Name, bool IsDirectory)>? List) List(string path)
     {
-        this.SendCommand(ListCommand, path);
+        try
+        {
+            this.SendCommand(ListCommand, path);
+        }
+        catch (IOException)
+        {
+            this.tcpClient.Close();
+            return ("Closed", null);
+        }
 
         long count = this.reader.ReadInt64();
         if (count == ErrorCode)
@@ -82,7 +90,15 @@ public class FTPClient : IDisposable
     /// <returns> A tuple containing an error message if any, and the file size. </returns>
     public (string? Error, long Size) Get(string path, string filenameSaveTo)
     {
-        this.SendCommand(GetCommand, path);
+        try
+        {
+            this.SendCommand(GetCommand, path);
+        }
+        catch (IOException)
+        {
+            this.tcpClient.Close();
+            return ("Closed", -1);
+        }
 
         var size = this.reader.ReadInt64();
         if (size == ErrorCode)
