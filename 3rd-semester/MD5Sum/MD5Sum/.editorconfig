@@ -1,0 +1,5 @@
+[*.cs]
+
+# SA1633: File should have header
+dotnet_diagnostic.SA0001.severity = none
+
