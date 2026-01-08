@@ -13,6 +13,7 @@ using System.Collections.Concurrent;
 /// <param name="threads"> The number of threads in the thread pool. </param>
 public class MyThreadPool
 {
+
     private readonly Thread[] threads;
     private readonly ConcurrentQueue<Action> queue = [];
     private readonly SemaphoreSlim semaphore = new(0);
@@ -22,9 +23,8 @@ public class MyThreadPool
     /// Initializes a new instance of the <see cref="MyThreadPool"/> class with the default number of threads (number of processors).
     /// </summary>
     public MyThreadPool()
+    : this(Environment.ProcessorCount)
     {
-        this.threads = new Thread[Environment.ProcessorCount];
-        this.StartThreads();
     }
 
     /// <summary>
@@ -36,6 +36,11 @@ public class MyThreadPool
         this.threads = new Thread[numberOfThreads];
         this.StartThreads();
     }
+
+    /// <summary>
+    /// Gets a value indicating whether threadpool is turned off.
+    /// </summary>
+    public bool IsTurnedOff => this.token.IsCancellationRequested;
 
     /// <summary>
     /// Submits a task to the thread pool for execution.
@@ -76,6 +81,11 @@ public class MyThreadPool
     /// <param name="action"> The action to be executed. </param>
     internal void Enqueue(Action action)
     {
+        if (this.token.IsCancellationRequested)
+        {
+            throw new TaskCanceledException("Threadpool is turned off");
+        }
+
         this.queue.Enqueue(action);
         this.semaphore.Release();
     }
@@ -83,12 +93,15 @@ public class MyThreadPool
     private void Worker()
     {
         Action? task = null;
-        while (!this.token.IsCancellationRequested)
+        while (true)
         {
             if (this.queue.TryDequeue(out task))
             {
                 task();
-                continue;
+            }
+            else if (this.token.IsCancellationRequested)
+            {
+                break;
             }
 
             try

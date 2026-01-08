@@ -68,7 +68,7 @@ public class MyThreadPoolTests
         var pool = new MyThreadPool(2);
         pool.Shutdown();
 
-        Assert.DoesNotThrow(() => pool.Submit(() => 1));
+        Assert.Throws<TaskCanceledException>(() => pool.Submit(() => 1));
     }
 
     [Test]
@@ -78,7 +78,7 @@ public class MyThreadPoolTests
 
         var task = pool.Submit<int>(() => throw new InvalidOperationException("Test"));
 
-        Assert.Throws<InvalidOperationException>(() => _ = task.Result);
+        Assert.Throws<AggregateException>(() => _ = task.Result);
     }
 
     [Test]
@@ -105,5 +105,41 @@ public class MyThreadPoolTests
                 Assert.Fail();
             }
         }
+    }
+
+    [Test]
+    public void Shutdown_RaceWithSubmit_DoesNotStuck()
+    {
+        var pool = new MyThreadPool(2);
+        var tasksCount = 100;
+
+        var shutdownThread = new Thread(() => pool.Shutdown());
+        shutdownThread.Start();
+
+        for (int i = 0; i < tasksCount; i++)
+        {
+            try
+            {
+                var task = pool.Submit(() => 1);
+                _ = task.Result;
+            }
+            catch (TaskCanceledException)
+            {
+            }
+        }
+
+        shutdownThread.Join();
+    }
+
+    [Test]
+    public void ContinueWith_AfterShutdown_ThrowsTaskCanceledException()
+    {
+        var pool = new MyThreadPool(1);
+        var task = pool.Submit(() => 42);
+
+        _ = task.Result;
+        pool.Shutdown();
+
+        Assert.Throws<TaskCanceledException>(() => task.ContinueWith(res => res * 2));
     }
 }

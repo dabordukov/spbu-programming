@@ -16,7 +16,7 @@ internal class MyTask<TResult>(MyThreadPool threadpool, Func<TResult> lambda) : 
 {
     private readonly Func<TResult> lambda = lambda;
     private readonly MyThreadPool threadpool = threadpool;
-    private readonly ManualResetEventSlim @lock = new(false);
+    private readonly ManualResetEventSlim eventLock = new(false);
     private readonly ConcurrentQueue<Action> nextTasks = [];
     private TResult? result;
     private Exception? exception;
@@ -30,15 +30,15 @@ internal class MyTask<TResult>(MyThreadPool threadpool, Func<TResult> lambda) : 
     {
         get
         {
-            this.@lock.Wait();
+            this.eventLock.Wait();
             if (this.exception is not null)
             {
-                if (this.exception is AggregateException e && e.InnerExceptions.Count == 1)
+                if (this.exception is AggregateException e)
                 {
-                    throw e.InnerException!;
+                    throw e;
                 }
 
-                throw this.exception;
+                throw new AggregateException(this.exception);
             }
 
             return this.result ?? throw new ArgumentNullException();
@@ -61,6 +61,11 @@ internal class MyTask<TResult>(MyThreadPool threadpool, Func<TResult> lambda) : 
             }
             else
             {
+                if (this.threadpool.IsTurnedOff)
+                {
+                    throw new TaskCanceledException("Threadpool is turned off");
+                }
+
                 this.nextTasks.Enqueue(newTask.Schedule);
             }
         }
@@ -72,9 +77,7 @@ internal class MyTask<TResult>(MyThreadPool threadpool, Func<TResult> lambda) : 
     /// Schedules the task for execution in the thread pool.
     /// </summary>
     internal void Schedule()
-    {
-        this.threadpool.Enqueue(this.Run);
-    }
+        => this.threadpool.Enqueue(this.Run);
 
     /// <summary>
     /// Executes the task.
@@ -92,13 +95,19 @@ internal class MyTask<TResult>(MyThreadPool threadpool, Func<TResult> lambda) : 
         finally
         {
             this.ready = true;
-            this.@lock.Set();
+            this.eventLock.Set();
 
             lock (this.nextTasks)
             {
-                foreach (var task in this.nextTasks)
+                while (this.nextTasks.TryDequeue(out var task))
                 {
-                    task();
+                    try
+                    {
+                        task();
+                    }
+                    catch (TaskCanceledException)
+                    {
+                    }
                 }
             }
         }
