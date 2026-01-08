@@ -34,7 +34,15 @@ if (args.Length > 1)
     }
 }
 
+var tokenSource = new CancellationTokenSource();
+
+Console.CancelKeyPress += (sender, eventArgs) =>
+{
+    eventArgs.Cancel = true;
+    tokenSource.Cancel();
+};
+
 using var ftp = new FTPServer(address, port);
-await ftp.StartAsync();
+await ftp.StartAsync(tokenSource.Token);
 
 return 0;

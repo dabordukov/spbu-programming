@@ -40,9 +40,7 @@ public static class Logging
     /// <param name="message"> The message to log. </param>
     /// <param name="tags"> Optional tags to include in the log. </param>
     public static void Info(StreamWriter stream, string message, params string[] tags)
-    {
-        Log(stream, message, "INFO", tags);
-    }
+        => Log(stream, message, "INFO", tags);
 
     /// <summary>
     /// Logs an error message.
@@ -51,7 +49,5 @@ public static class Logging
     /// <param name="message"> The message to log. </param>
     /// <param name="tags"> Optional tags to include in the log. </param>
     public static void Error(StreamWriter stream, string message, params string[] tags)
-    {
-        Log(stream, message, "ERROR", tags);
-    }
+        => Log(stream, message, "ERROR", tags);
 }

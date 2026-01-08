@@ -30,8 +30,7 @@ public class SimpleFTPTests
         this.cts = new CancellationTokenSource();
         this.server = new FTPServer(Host, Port, 15);
         _ = Task.Run(() => this.server.StartAsync(this.cts.Token));
-
-        await Task.Delay(3000);
+        this.server.WaitForReady();
     }
 
     [TearDown]
@@ -51,6 +50,8 @@ public class SimpleFTPTests
     public void List_ShouldReturnFilesAndFolders()
     {
         using var client = new FTPClient(Host, Port);
+        var task = Task.Run(async () => await client.ConnectAsync());
+        task.Wait();
         var (error, list) = client.List(this.testDir);
 
         Assert.That(error, Is.Null);
@@ -63,6 +64,8 @@ public class SimpleFTPTests
     public void List_ShouldReturnError_ForMissingDirectory()
     {
         using var client = new FTPClient(Host, Port);
+        var task = Task.Run(async () => await client.ConnectAsync());
+        task.Wait();
         var (error, list) = client.List(Path.Combine(this.testDir, "does_not_exist"));
 
         Assert.That(error, Is.Not.Null);
@@ -74,6 +77,8 @@ public class SimpleFTPTests
     public void Get_ShouldDownloadFileCorrectly()
     {
         using var client = new FTPClient(Host, Port);
+        var task = Task.Run(async () => await client.ConnectAsync());
+        task.Wait();
         var saveTo = Path.Combine(this.testDir, "download.txt");
         var (error, size) = client.Get(Path.Combine(this.testDir, "a.txt"), saveTo);
 
@@ -87,6 +92,8 @@ public class SimpleFTPTests
     public void Get_ShouldReturnError_WhenFileDoesNotExist()
     {
         using var client = new FTPClient(Host, Port);
+        var task = Task.Run(async () => await client.ConnectAsync());
+        task.Wait();
         var saveTo = Path.Combine(this.testDir, "download.txt");
         var (error, size) = client.Get("missing.txt", saveTo);
 

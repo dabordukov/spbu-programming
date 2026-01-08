@@ -10,14 +10,20 @@ using System.Net.Sockets;
 using Logging;
 
 /// <summary>
-/// FTPServer class.
+/// FTPServer listens for incoming TCP connections and services a simple binary/text protocol
+/// that supports directory listing and file retrieval.
 /// </summary>
+/// <param name="ip"> IP address to listen on. </param>
+/// <param name="port"> Port to listen on. </param>
+/// <param name="stream"> Stream to write logs. </param>
+/// <param name="clientTimeoutSeconds"> Timeout in seconds for each client. </param>
 public class FTPServer(string ip, int port, Stream stream, int clientTimeoutSeconds = 60) : IDisposable
 {
     private const long ErrorCode = -1;
     private readonly TcpListener tcpListener = new(IPAddress.Parse(ip), port);
     private readonly StreamWriter loggerStream = new(stream);
     private readonly List<Task> activeTasks = [];
+    private readonly ManualResetEventSlim readyEvent = new(false);
     private int clientTimeoutSeconds = clientTimeoutSeconds;
 
     /// <summary>
@@ -29,17 +35,13 @@ public class FTPServer(string ip, int port, Stream stream, int clientTimeoutSeco
     /// <param name="clientTimeoutSeconds"> Client timeout in seconds. </param>
     public FTPServer(string ip, int port, int clientTimeoutSeconds = 60)
     : this(ip, port, Console.OpenStandardOutput(), clientTimeoutSeconds)
-    {
-        this.loggerStream.AutoFlush = true;
-    }
+        => this.loggerStream.AutoFlush = true;
 
     /// <summary>
     /// Disposes the FTPServer.
     /// </summary>
     public void Dispose()
-    {
-        this.tcpListener.Dispose();
-    }
+        => this.tcpListener.Dispose();
 
     /// <summary>
     /// Starts the FTP server.
@@ -51,6 +53,7 @@ public class FTPServer(string ip, int port, Stream stream, int clientTimeoutSeco
         try
         {
             this.tcpListener.Start();
+            this.readyEvent.Set();
             Logging.Info(this.loggerStream, $"Server started on {this.tcpListener.Server.LocalEndPoint}");
             while (!token.IsCancellationRequested)
             {
@@ -61,7 +64,7 @@ public class FTPServer(string ip, int port, Stream stream, int clientTimeoutSeco
                     try
                     {
                         using var connection = new TcpConnectionProcessor(this.loggerStream, tcpClient, this.clientTimeoutSeconds);
-                        await connection.ProcessConnection();
+                        await connection.ProcessConnection(token);
                     }
                     catch (Exception e)
                     {
@@ -70,9 +73,8 @@ public class FTPServer(string ip, int port, Stream stream, int clientTimeoutSeco
                 },
                 token);
                 this.activeTasks.Add(task);
+                this.activeTasks.RemoveAll(task => task.IsCompleted);
             }
-
-            Task.WaitAll(this.activeTasks, token);
         }
         catch (Exception e)
         {
@@ -82,9 +84,16 @@ public class FTPServer(string ip, int port, Stream stream, int clientTimeoutSeco
         finally
         {
             this.tcpListener.Stop();
+            await Task.WhenAll(this.activeTasks).WaitAsync(TimeSpan.FromSeconds(5));
             Logging.Info(this.loggerStream, "Server stopped");
         }
     }
+
+    /// <summary>
+    /// Blocks thread until server started.
+    /// </summary>
+    public void WaitForReady()
+        => this.readyEvent.Wait();
 
     private class TcpConnectionProcessor : IDisposable
     {
@@ -124,16 +133,17 @@ public class FTPServer(string ip, int port, Stream stream, int clientTimeoutSeco
             this.tcpClient.Dispose();
         }
 
-        public async Task ProcessConnection()
+        public async Task ProcessConnection(CancellationToken token)
         {
             Logging.Info(this.loggerStream, "CONNECTED", this.endpoint);
-            while (true)
+            while (!token.IsCancellationRequested)
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.clientTimeoutSeconds));
+                using var timeoutTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(this.clientTimeoutSeconds));
+                using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, timeoutTokenSource.Token);
                 string? line;
                 try
                 {
-                    line = await this.reader.ReadLineAsync(cts.Token);
+                    line = await this.reader.ReadLineAsync(linkedTokenSource.Token);
                 }
                 catch (OperationCanceledException)
                 {

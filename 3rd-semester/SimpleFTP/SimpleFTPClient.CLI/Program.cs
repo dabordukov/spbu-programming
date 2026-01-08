@@ -45,7 +45,25 @@ if (args.Length > 1)
 
 try
 {
+    var tokenSource = new CancellationTokenSource();
     using var client = new FTPClient(address, port);
+
+    Console.CancelKeyPress += (sender, eventArgs) =>
+    {
+        eventArgs.Cancel = true;
+        tokenSource.Cancel();
+    };
+
+    try
+    {
+        await client.ConnectAsync(tokenSource.Token);
+    }
+    catch (TaskCanceledException)
+    {
+        Console.WriteLine("Connection cancelled by user.");
+        return 0;
+    }
+
     Console.WriteLine($"{menuMessage}\n");
 
     while (true)
@@ -98,7 +116,7 @@ try
                 continue;
             }
 
-            Console.WriteLine("Enter path to save the file to");
+            Console.WriteLine("Enter path to file to save the downloading file into");
             var savePath = Console.ReadLine();
             if (savePath is null)
             {

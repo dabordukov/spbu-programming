@@ -8,28 +8,31 @@ namespace SimpleFTPClient;
 using System.Net.Sockets;
 
 /// <summary>
-/// FTPClient class.
+/// FTPClient connects to FTP server. Supports directory listing and file retrieval.
 /// </summary>
-public class FTPClient : IDisposable
+/// <param name="ip"> IP address of the FTP server. </param>
+/// <param name="port"> Port of the FTP server. </param>
+public class FTPClient(string ip, int port) : IDisposable
 {
     private const int BufferSize = 4096;
     private const long ErrorCode = -1;
     private const string ListCommand = "1";
     private const string GetCommand = "2";
     private readonly TcpClient tcpClient = new();
-    private readonly NetworkStream stream;
-    private readonly StreamWriter writer;
-    private readonly BinaryReader reader;
+    private readonly string ip = ip;
+    private readonly int port = port;
+    private NetworkStream? stream;
+    private StreamWriter? writer;
+    private BinaryReader? reader;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FTPClient"/> class.
+    /// Connects to FTP server.
     /// </summary>
-    /// <param name="ip"> IP address of the FTP server. </param>
-    /// <param name="port"> Port of the FTP server. </param>
     /// <param name="token"> Cancellation token. </param>
-    public FTPClient(string ip, int port)
+    /// <returns> A <see cref="Task"/> representing the asynchronous operation of connecting to the FTP server. </returns>
+    public async Task ConnectAsync(CancellationToken token = default)
     {
-        this.tcpClient.Connect(ip, port);
+        await this.tcpClient.ConnectAsync(this.ip, this.port, token);
         this.stream = this.tcpClient.GetStream();
         this.reader = new BinaryReader(this.stream);
         this.writer = new StreamWriter(this.stream);
@@ -40,8 +43,8 @@ public class FTPClient : IDisposable
     /// </summary>
     public void Dispose()
     {
-        this.reader.Dispose();
-        this.writer.Dispose();
+        this.reader?.Dispose();
+        this.writer?.Dispose();
         this.tcpClient.Dispose();
     }
 
@@ -52,6 +55,11 @@ public class FTPClient : IDisposable
     /// <returns> A tuple containing an error message if any, and the list of files. </returns>
     public (string? Error, List<(string Name, bool IsDirectory)>? List) List(string path)
     {
+        if (this.reader is null)
+        {
+            throw new ArgumentNullException("Connection is not opened");
+        }
+
         try
         {
             this.SendCommand(ListCommand, path);
@@ -90,6 +98,11 @@ public class FTPClient : IDisposable
     /// <returns> A tuple containing an error message if any, and the file size. </returns>
     public (string? Error, long Size) Get(string path, string filenameSaveTo)
     {
+        if (this.reader is null || this.stream is null)
+        {
+            throw new ArgumentNullException("Connection is not opened");
+        }
+
         try
         {
             this.SendCommand(GetCommand, path);
@@ -134,6 +147,11 @@ public class FTPClient : IDisposable
 
     private void SendCommand(string command, string path)
     {
+        if (this.writer is null)
+        {
+            throw new ArgumentNullException("Connection is not opened");
+        }
+
         this.writer.Write(command);
         this.writer.Write(' ');
         this.writer.Write(path);
