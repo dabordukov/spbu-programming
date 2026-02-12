@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Compile Include="ListReverse.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 
 </Project>
