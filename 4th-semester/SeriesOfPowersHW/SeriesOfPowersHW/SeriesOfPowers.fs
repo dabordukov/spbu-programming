@@ -16,9 +16,10 @@ let getListOfPowersOfTwo n m =
             calculateFirstPower (power - 1) (acc * 2.0)
 
     let rec generateList list counter =
-        if counter < 1 then
+        if counter = 0 then
             list
         else
             generateList (2.0 * List.head list :: list) (counter - 1)
 
-    List.rev (generateList [ calculateFirstPower n 1.0 ] m)
+    if m < 0 then []
+    else List.rev (generateList [ calculateFirstPower n 1.0 ] m)
