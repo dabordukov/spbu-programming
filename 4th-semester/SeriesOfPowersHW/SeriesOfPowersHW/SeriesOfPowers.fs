@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-open System
+module SeriesOfPowers
 
 // Generate [2^n; 2^(n + 1); ...; 2^(n + m)] list
 let getListOfPowersOfTwo n m =
@@ -22,10 +22,3 @@ let getListOfPowersOfTwo n m =
             generateList (2.0 * List.head list :: list) (counter - 1)
 
     List.rev (generateList [ calculateFirstPower n 1.0 ] m)
-
-let args = Environment.GetCommandLineArgs()
-
-if args.Length = 3 then
-    printfn "%A" (getListOfPowersOfTwo (int args.[1]) (int args.[2]))
-else
-    printfn "usage: ./bin n m\nn, m - integer numbers"

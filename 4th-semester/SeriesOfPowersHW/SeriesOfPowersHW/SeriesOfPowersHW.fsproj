@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="PowerOfSeries.fs" />
+    <Compile Include="SeriesOfPowers.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 
 </Project>
