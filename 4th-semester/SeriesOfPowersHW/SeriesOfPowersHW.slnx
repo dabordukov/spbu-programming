@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SeriesOfPowersHW/SeriesOfPowersHW.fsproj" />
+  <Project Path="SeriesOfPowers.Test/SeriesOfPowers.Test.fsproj" />
+</Solution>
