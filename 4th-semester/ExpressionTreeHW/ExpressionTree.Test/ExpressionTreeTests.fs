@@ -1,7 +1,6 @@
 ﻿module ExpressionTree.Test
 
 open NUnit.Framework
-open FsUnit
 open ExpressionTree
 
 let TestCases =

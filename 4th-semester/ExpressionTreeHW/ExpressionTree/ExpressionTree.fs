@@ -17,48 +17,24 @@ type ContinuationStep =
     | Step of (unit -> ContinuationStep)
 
 let rec linearize (expr: Expression) (cont: int option -> ContinuationStep) =
+    let nextBinaryFunction left right nextFunction cont =
+        Step(fun () ->
+            linearize left (fun leftResult ->
+                match leftResult with
+                | Some leftValue ->
+                    linearize right (fun rightResult ->
+                        match rightResult with
+                        | Some rightValue -> cont (nextFunction leftValue rightValue)
+                        | None -> Finished None)
+                | None -> Finished None))
+
     match expr with
     | Number x -> cont (Some x)
-    | Add(expr1, expr2) ->
-        Step(fun () ->
-            linearize expr1 (fun leftResult ->
-                match leftResult with
-                | Some leftValue ->
-                    linearize expr2 (fun rightResult ->
-                        match rightResult with
-                        | Some rightValue -> cont (Some(leftValue + rightValue))
-                        | None -> Finished None)
-                | None -> Finished None))
-    | Subtract(expr1, expr2) ->
-        Step(fun () ->
-            linearize expr1 (fun leftResult ->
-                match leftResult with
-                | Some leftValue ->
-                    linearize expr2 (fun rightResult ->
-                        match rightResult with
-                        | Some rightValue -> cont (Some(leftValue - rightValue))
-                        | None -> Finished None)
-                | None -> Finished None))
-    | Multiply(expr1, expr2) ->
-        Step(fun () ->
-            linearize expr1 (fun leftResult ->
-                match leftResult with
-                | Some leftValue ->
-                    linearize expr2 (fun rightResult ->
-                        match rightResult with
-                        | Some rightValue -> cont (Some(leftValue * rightValue))
-                        | None -> Finished None)
-                | None -> Finished None))
-    | Divide(expr1, expr2) ->
-        Step(fun () ->
-            linearize expr1 (fun leftResult ->
-                match leftResult with
-                | Some leftValue ->
-                    linearize expr2 (fun rightResult ->
-                        match rightResult with
-                        | Some rightValue when rightValue <> 0 -> cont (Some(leftValue / rightValue))
-                        | _ -> Finished None)
-                | None -> Finished None))
+    | Add(leftExpr, rightExpr) -> nextBinaryFunction leftExpr rightExpr (fun left right -> Some(left + right)) cont
+    | Subtract(leftExpr, rightExpr) -> nextBinaryFunction leftExpr rightExpr (fun left right -> Some(left - right)) cont
+    | Multiply(leftExpr, rightExpr) -> nextBinaryFunction leftExpr rightExpr (fun left right -> Some(left * right)) cont
+    | Divide(leftExpr, rightExpr) ->
+        nextBinaryFunction leftExpr rightExpr (fun left right -> if right <> 0 then Some(left / right) else None) cont
 
 let evaluateExpression (expr: Expression) =
     let steps = linearize expr (fun (res) -> Finished res)
