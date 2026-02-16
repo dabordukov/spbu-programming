@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="TreeMap.Test/TreeMap.Test.fsproj" />
+  <Project Path="TreeMap/TreeMap.fsproj" />
+</Solution>
