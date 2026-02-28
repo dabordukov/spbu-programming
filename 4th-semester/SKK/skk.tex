@@ -1,0 +1,19 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\begin{document}
+
+\[
+\begin{aligned}
+SKK &= (\lambda x y z.\, xz(yz))(\lambda x y.\, x)(\lambda x y.\, x) \\
+    &= (\lambda x y z.\, xz(yz))(\lambda w.\, (\lambda x y.\, x)) \\
+    &= \lambda h z.\, (\lambda w.\, (\lambda x y.\, x))z(hz) \\
+    &= \lambda h z.\, (\lambda x y.\, x)(hz) \\
+    &= \lambda z.\, (\lambda x y.\, x)z \\
+    &= \lambda z.\, z \\
+    &= I
+\end{aligned}
+\]
+
+\end{document}
