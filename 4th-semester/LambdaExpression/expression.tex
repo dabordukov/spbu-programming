@@ -1,0 +1,15 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+
+\begin{document}
+
+\begin{align*}
+&((\lambda a.(\lambda b.bb) (\lambda b.bb)) b) ((\lambda c.(cb)) (\lambda a.a)) = \\
+&((\lambda a.(\lambda b.bb) (\lambda b.bb)) b) ((\lambda a.a)b) = \\
+&((\lambda a.(\lambda b.bb)(\lambda b.bb))b) b = \\
+&((\lambda b.bb)(\lambda b.bb))b \quad \text{(нормальной формы нет)}
+\end{align*}
+
+\end{document}
