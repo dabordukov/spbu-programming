@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ExpressionTree.Test/ExpressionTree.Test.fsproj" />
+  <Project Path="ExpressionTree/ExpressionTree.fsproj" />
+</Solution>
