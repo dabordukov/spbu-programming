@@ -5,6 +5,8 @@
 
 namespace MyThreadPool.Test;
 
+using System.Collections.Concurrent;
+
 public class MyThreadPoolTests
 {
     [Test]
@@ -43,15 +45,7 @@ public class MyThreadPoolTests
         var tasks = new IMyTask<int>[tasksCount];
         for (int i = 0; i < tasksCount; i++)
         {
-            tasks[i] = pool.Submit(() =>
-            {
-                lock (lockObj)
-                {
-                    counter++;
-                }
-
-                return counter;
-            });
+            tasks[i] = pool.Submit(() => Interlocked.Increment(ref counter));
         }
 
         for (int i = 0; i < tasksCount; i++)
@@ -141,5 +135,96 @@ public class MyThreadPoolTests
         pool.Shutdown();
 
         Assert.Throws<TaskCanceledException>(() => task.ContinueWith(res => res * 2));
+    }
+
+    [Test]
+    public void Shutdown_RaceWithSubmit_NoTasksLost()
+    {
+        const int threadsCount = 4;
+        var pool = new MyThreadPool(threadsCount);
+        var barrier = new Barrier(threadsCount + 1);
+        var results = new ConcurrentBag<IMyTask<int>>();
+        var exceptions = new ConcurrentBag<Exception>();
+
+        var threads = new List<Thread>();
+        for (int i = 0; i < threadsCount; i++)
+        {
+            var t = new Thread(() =>
+            {
+                barrier.SignalAndWait();
+                try
+                {
+                    var task = pool.Submit(() => 1);
+                    results.Add(task);
+                }
+                catch (TaskCanceledException ex)
+                {
+                    exceptions.Add(ex);
+                }
+            });
+
+            threads.Add(t);
+            t.Start();
+        }
+
+        barrier.SignalAndWait();
+        pool.Shutdown();
+
+        foreach (var t in threads)
+        {
+            t.Join();
+        }
+
+        foreach (var task in results)
+        {
+            bool completed = Task.Run(() => { _ = task.Result; }).Wait(1000);
+
+            Assert.That(completed, Is.True, "Задача была принята, но не была исполнена после Shutdown.");
+        }
+
+        Assert.That(results.Count + exceptions.Count, Is.EqualTo(threadsCount));
+    }
+
+    [Test]
+    public void Shutdown_MultipleThreadsCallingShutdown_ShouldNotThrowOrHang()
+    {
+        const int shutdownThreadsCount = 10;
+        var pool = new MyThreadPool(4);
+        var barrier = new Barrier(shutdownThreadsCount);
+        var exceptions = new ConcurrentBag<Exception>();
+
+        var threads = new List<Thread>();
+        for (int i = 0; i < shutdownThreadsCount; i++)
+        {
+            var t = new Thread(() =>
+            {
+                barrier.SignalAndWait();
+                try
+                {
+                    pool.Shutdown();
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            });
+
+            threads.Add(t);
+            t.Start();
+        }
+
+        foreach (var t in threads)
+        {
+            if (!t.Join(TimeSpan.FromSeconds(5)))
+            {
+                Assert.Fail("Shutdown blocked thread.");
+            }
+        }
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(exceptions, Is.Empty, $"{exceptions.FirstOrDefault()?.Message}");
+            Assert.That(pool.IsTurnedOff, Is.True);
+        });
     }
 }
