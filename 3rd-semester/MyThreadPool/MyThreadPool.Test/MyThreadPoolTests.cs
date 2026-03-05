@@ -138,6 +138,64 @@ public class MyThreadPoolTests
     }
 
     [Test]
+    public void ContinueWith_RaceWithShutdown_AllContinuationsMustExecute()
+    {
+        const int numContinuations = 100;
+        var pool = new MyThreadPool(4);
+        var barrier = new Barrier(numContinuations + 1);
+
+        var baseTask = pool.Submit(() => 1);
+        _ = baseTask.Result;
+
+        var acceptedContinuations = new ConcurrentBag<IMyTask<int>>();
+        var cancellationCaught = 0;
+
+        var threads = new List<Thread>();
+        for (int i = 0; i < numContinuations; i++)
+        {
+            var t = new Thread(() =>
+            {
+                barrier.SignalAndWait();
+                try
+                {
+                    var cont = baseTask.ContinueWith(res => res * 2);
+                    acceptedContinuations.Add(cont);
+                }
+                catch (TaskCanceledException)
+                {
+                    Interlocked.Increment(ref cancellationCaught);
+                }
+            });
+            threads.Add(t);
+            t.Start();
+        }
+
+        var shutdownThread = new Thread(() =>
+        {
+            barrier.SignalAndWait();
+            pool.Shutdown();
+        });
+
+        shutdownThread.Start();
+        foreach (var t in threads)
+        {
+            t.Join();
+        }
+
+        shutdownThread.Join();
+
+        foreach (var cont in acceptedContinuations)
+        {
+            bool finished = Task.Run(() =>
+            {
+                Assert.That(cont.Result, Is.EqualTo(84));
+            }).Wait(1000);
+
+            Assert.That(finished, Is.True);
+        }
+    }
+
+    [Test]
     public void Shutdown_RaceWithSubmit_NoTasksLost()
     {
         const int threadsCount = 4;
