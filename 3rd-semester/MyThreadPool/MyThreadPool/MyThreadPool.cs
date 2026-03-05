@@ -103,12 +103,12 @@ public class MyThreadPool
 
     private void Worker()
     {
-        Action? task = null;
         while (true)
         {
-            if (this.queue.TryDequeue(out task))
+            if (this.queue.TryDequeue(out var task))
             {
                 task();
+                continue;
             }
             else if (this.token.IsCancellationRequested)
             {
