@@ -48,10 +48,7 @@ internal class MyTask<TResult>(MyThreadPool threadpool, Func<TResult> lambda) : 
     /// <inheritdoc/>
     public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> nextTask)
     {
-        var newTask = new MyTask<TNewResult>(this.threadpool, () =>
-        {
-            return nextTask(this.Result);
-        });
+        var newTask = new MyTask<TNewResult>(this.threadpool, () => nextTask(this.Result));
 
         lock (this.nextTasks)
         {
