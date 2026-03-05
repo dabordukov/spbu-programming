@@ -41,7 +41,7 @@ internal class MyTask<TResult>(MyThreadPool threadpool, Func<TResult> lambda) : 
                 throw new AggregateException(this.exception);
             }
 
-            return this.result ?? throw new ArgumentNullException();
+            return this.result ?? throw new InvalidOperationException();
         }
     }
 
