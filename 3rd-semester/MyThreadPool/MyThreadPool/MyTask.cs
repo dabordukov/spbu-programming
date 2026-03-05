@@ -48,13 +48,23 @@ internal class MyTask<TResult>(MyThreadPool threadpool, Func<TResult> lambda) : 
     /// <inheritdoc/>
     public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> nextTask)
     {
-        var newTask = new MyTask<TNewResult>(this.threadpool, () => nextTask(this.Result));
+        var newTask = new MyTask<TNewResult>(this.threadpool, () =>
+        {
+            return nextTask(this.Result);
+        });
 
         lock (this.nextTasks)
         {
             if (this.IsCompleted)
             {
-                this.threadpool.Enqueue(newTask.Run);
+                if (this.exception is not null)
+                {
+                    newTask.FailDirectly(this.exception);
+                }
+                else
+                {
+                    this.threadpool.Enqueue(newTask.Run);
+                }
             }
             else
             {
@@ -63,7 +73,17 @@ internal class MyTask<TResult>(MyThreadPool threadpool, Func<TResult> lambda) : 
                     throw new TaskCanceledException("Threadpool is turned off");
                 }
 
-                this.nextTasks.Enqueue(newTask.Schedule);
+                this.nextTasks.Enqueue(() =>
+                {
+                    if (this.exception is not null)
+                    {
+                        newTask.FailDirectly(this.exception);
+                    }
+                    else
+                    {
+                        newTask.Schedule();
+                    }
+                });
             }
         }
 
@@ -91,20 +111,31 @@ internal class MyTask<TResult>(MyThreadPool threadpool, Func<TResult> lambda) : 
         }
         finally
         {
-            this.ready = true;
-            this.eventLock.Set();
+            this.Complete();
+        }
+    }
 
-            lock (this.nextTasks)
+    private void FailDirectly(Exception e)
+    {
+        this.exception = e is AggregateException ? e : new AggregateException(e);
+        this.Complete();
+    }
+
+    private void Complete()
+    {
+        this.ready = true;
+        this.eventLock.Set();
+
+        lock (this.nextTasks)
+        {
+            while (this.nextTasks.TryDequeue(out var task))
             {
-                while (this.nextTasks.TryDequeue(out var task))
+                try
                 {
-                    try
-                    {
-                        task();
-                    }
-                    catch (TaskCanceledException)
-                    {
-                    }
+                    task();
+                }
+                catch (TaskCanceledException)
+                {
                 }
             }
         }

@@ -285,4 +285,26 @@ public class MyThreadPoolTests
             Assert.That(pool.IsTurnedOff, Is.True);
         });
     }
+
+    [Test]
+    public void ContinueWith_CascadeException_PropagatesThroughAllStages()
+    {
+        var pool = new MyThreadPool(2);
+
+        var rootTask = pool.Submit<int>(() =>
+        {
+            throw new InvalidOperationException("Root fail");
+        });
+
+        var level1 = rootTask.ContinueWith(res => res + 10);
+        var level2 = level1.ContinueWith(res => res + 10);
+
+        var root = Assert.Throws<AggregateException>(() => _ = rootTask.Result);
+        Assert.That(root.InnerException, Is.TypeOf<InvalidOperationException>());
+
+        Assert.Throws<AggregateException>(() => _ = level1.Result);
+        var exLevel2 = Assert.Throws<AggregateException>(() => _ = level2.Result);
+
+        Assert.That(exLevel2.InnerException, Is.TypeOf<InvalidOperationException>());
+    }
 }
