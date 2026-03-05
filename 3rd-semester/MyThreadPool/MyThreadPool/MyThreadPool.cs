@@ -13,11 +13,11 @@ using System.Collections.Concurrent;
 /// <param name="threads"> The number of threads in the thread pool. </param>
 public class MyThreadPool
 {
-
     private readonly Thread[] threads;
     private readonly ConcurrentQueue<Action> queue = [];
     private readonly SemaphoreSlim semaphore = new(0);
     private readonly CancellationTokenSource token = new();
+    private readonly Lock shutdownLock = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MyThreadPool"/> class with the default number of threads (number of processors).
@@ -62,7 +62,15 @@ public class MyThreadPool
     /// </summary>
     public void Shutdown()
     {
-        this.token.Cancel();
+        lock (this.shutdownLock)
+        {
+            if (this.token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            this.token.Cancel();
+        }
 
         for (int i = 0; i < this.threads.Length; i++)
         {
@@ -81,13 +89,16 @@ public class MyThreadPool
     /// <param name="action"> The action to be executed. </param>
     internal void Enqueue(Action action)
     {
-        if (this.token.IsCancellationRequested)
+        lock (this.shutdownLock)
         {
-            throw new TaskCanceledException("Threadpool is turned off");
-        }
+            if (this.token.IsCancellationRequested)
+            {
+                throw new TaskCanceledException("Threadpool is turned off");
+            }
 
-        this.queue.Enqueue(action);
-        this.semaphore.Release();
+            this.queue.Enqueue(action);
+            this.semaphore.Release();
+        }
     }
 
     private void Worker()
