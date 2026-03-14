@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="NumberFinder.Test/NumberFinder.Test.fsproj" />
+  <Project Path="NumberFinder/NumberFinder.fsproj" />
+</Solution>
