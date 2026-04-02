@@ -13,11 +13,6 @@ module MinElement
 /// <c>Some</c> minimum value when the list is not empty; otherwise <c>None</c>.
 /// </returns>
 let findMin list =
-    let rec find tail min =
-        match tail with
-        | [] -> min
-        | h :: t -> find t (if h < min then h else min)
-
     match list with
     | [] -> None
-    | h :: t -> Some(find t h)
+    | h :: t -> Some(List.fold (fun min element -> if element < min then element else min) h t)
