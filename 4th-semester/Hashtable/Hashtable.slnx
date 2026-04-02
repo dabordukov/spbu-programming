@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Hashtable.Test/Hashtable.Test.fsproj" />
+  <Project Path="Hashtable/Hashtable.fsproj" />
+</Solution>
