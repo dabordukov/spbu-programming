@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MinElement.Test/MinElement.Test.fsproj" />
+  <Project Path="MinElement/MinElement.fsproj" />
+</Solution>
