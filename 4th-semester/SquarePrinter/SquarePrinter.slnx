@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SquarePrinter.Test/SquarePrinter.Test.fsproj" />
+  <Project Path="SquarePrinter/SquarePrinter.fsproj" />
+</Solution>
