@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="OptimizedMap.Test/OptimizedMap.Test.csproj" />
+  <Project Path="OptimizedMap/OptimizedMap.csproj" />
+</Solution>
